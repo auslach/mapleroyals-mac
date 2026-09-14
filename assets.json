@@ -1,0 +1,44 @@
+[
+  {
+    "name": "WS11WineSikarugir11.0.tar.xz",
+    "size": 167335332,
+    "digest": "sha256:d12fa09149b9afd3be349d726eecea6b2216ac574c91f93f56d872bb6ca7b795",
+    "updated_at": "2026-09-03T16:23:04Z",
+    "browser_download_url": "https://github.com/Sikarugir-App/Engines/releases/download/v1.0/WS11WineSikarugir11.0.tar.xz"
+  },
+  {
+    "name": "WS12WineCX24.0.7_5.tar.xz",
+    "size": 172323084,
+    "digest": "sha256:c5f51096bed8295814c9d9269f067d1b19c648d8417972bc1f1985c587d07ac5",
+    "updated_at": "2025-08-19T12:30:24Z",
+    "browser_download_url": "https://github.com/Sikarugir-App/Engines/releases/download/v1.0/WS12WineCX24.0.7_5.tar.xz"
+  },
+  {
+    "name": "WS12WineCX24.0.7_7.tar.xz",
+    "size": 172348356,
+    "digest": "sha256:203f9e9fd6c2cc77e6525d798a434ced326145db34a356355e05659d3445fd1c",
+    "updated_at": "2025-11-20T12:59:12Z",
+    "browser_download_url": "https://github.com/Sikarugir-App/Engines/releases/download/v1.0/WS12WineCX24.0.7_7.tar.xz"
+  },
+  {
+    "name": "WS12WineSikarugir10.0_6.tar.xz",
+    "size": 166304096,
+    "digest": "sha256:9da7ee0cbf386522f3a9906943726d9c3c125dbbd9ab120e3cde80e88d6091b2",
+    "updated_at": "2026-04-10T22:44:58Z",
+    "browser_download_url": "https://github.com/Sikarugir-App/Engines/releases/download/v1.0/WS12WineSikarugir10.0_6.tar.xz"
+  },
+  {
+    "name": "Template-1.0.15.tar.xz",
+    "size": 87477092,
+    "digest": "sha256:34273bcce885ce5a7fd6937af9ea344bb9961de7d55d6193f7413142e835c8c3",
+    "updated_at": "2026-09-04T03:37:26Z",
+    "browser_download_url": "https://github.com/Sikarugir-App/Wrapper/releases/download/v1.0/Template-1.0.15.tar.xz"
+  },
+  {
+    "name": "wine-devel-11.17-osx64.tar.xz",
+    "size": 191290556,
+    "digest": "sha256:c2b3a8274dbc594deaa64e40469b607cbc4aa8ef5656dec4c5f6f3dac0da770c",
+    "updated_at": "2026-09-11T04:17:55Z",
+    "browser_download_url": "https://github.com/Gcenx/macOS_Wine_builds/releases/download/11.17/wine-devel-11.17-osx64.tar.xz"
+  }
+]

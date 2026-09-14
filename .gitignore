@@ -1,0 +1,43 @@
+# Local build products and Python caches
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+build/
+dist/
+swift-cache/
+*.app/
+
+# Downloaded dependencies, installers and game assets do not belong in Git.
+downloads/
+cache/
+runtime*/
+template/
+prefix*/
+drive_c/
+dosdevices/
+work/
+*.exe
+*.dll
+*.dylib
+*.so
+*.wz
+*.img
+*.msi
+*.pkg
+*.dmg
+*.zip
+*.tar
+*.tar.*
+
+# User state and diagnostic files
+logs/
+*.log
+user.reg
+userdef.reg
+system.reg
+.launcher-setup-*
+provisioned-assets.json
+.env
+.env.*
