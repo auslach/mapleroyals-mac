@@ -54,9 +54,9 @@ The full template is downloaded for its native dependency libraries. Its launche
 
 ## Validation limits
 
-The actual working game was installed under Sikarugir Wine 10, cloned, and migrated to CX24. Engine, Windows version and desktop activation changes were not isolated as separate causes of the character-entry fix. The direct-CX24 clean installation recipe remains unvalidated through gameplay.
+The original working game was installed under Sikarugir Wine 10, cloned, and migrated to CX24. Engine, Windows version and desktop activation changes were not isolated as separate causes of the character-entry fix. On September 14, the portable ZIP separately completed a fresh direct-CX24 installation on the same Mac and reached character loading on retry and map changes. One initial character-loading failure remains unexplained. This validates that portable flow on this Mac, not every clean Mac or the separate Terminal recipe. See [ZIP acceptance](ZIP_ACCEPTANCE.md).
 
-On the test Mac, the user confirmed game entry and movement and compared both resolutions repeatedly. PIC was not prompted. Map changes and two concurrent clients were not independently completed as acceptance checks. The final OpenGL app was user-confirmed playable at 800×600; 1024×768 remained laggy.
+On the test Mac, the user confirmed game entry and movement and compared both resolutions repeatedly. PIC was not prompted. Map changes were subsequently confirmed in the fresh ZIP test. Two concurrent clients remain untested and are not exposed by the portable launcher. The final OpenGL app was user-confirmed playable at 800×600; 1024×768 remained laggy.
 
 ## Optional display helper
 

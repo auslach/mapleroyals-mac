@@ -17,4 +17,6 @@ Passed:
 
 All build/ignore fixtures lived in temporary directories and were removed afterward. The user's working game installation was not modified. These checks were completed before the source directory was initialized as a Git repository or published.
 
-Still unvalidated: clean installation through gameplay, a second Mac, PIC interaction, deliberate map-change acceptance checks, simultaneous clients, smooth 1024×768 performance, and production signing/notarization. See [research](RESEARCH.md) for the original gameplay evidence and known failures.
+These source-export checks were followed by a separate test of the compiled portable ZIP. That test completed fresh direct-CX24 installation, character loading on retry, map changes and normal shutdown on the original Mac; reopening the app started the installed game without repeating setup and the user loaded their character again. See [ZIP acceptance](ZIP_ACCEPTANCE.md) for the exact artifact, the initial unexplained character-loading failure, and the successful relaunch gameplay check.
+
+Still unvalidated: a second Mac, missing-Rosetta setup, downloaded-app first-open security prompts, PIC interaction, simultaneous clients, smooth 1024×768 performance, and production signing/notarization. The original Terminal recipe itself has not separately completed a fresh gameplay test. See [research](RESEARCH.md) for the original gameplay evidence and known failures.

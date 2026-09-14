@@ -2,19 +2,19 @@
 
 Open the Windows MapleRoyals client through a small native Mac launcher, without CrossOver or a Wine settings interface. A ready-built hobby preview can now handle first-run setup inside the app. Recipients of that preview do not need Terminal, Python or Command Line Tools. The source-build instructions are also preserved below.
 
-**Status: experimental.** Gameplay was confirmed on an M1 Pro MacBook Pro running macOS 26.5.2, using the July 2, 2026 WZ client. **800×600 was smoother and playable; 1024×768 still had noticeable visual lag.** The successful installation was originally installed with Wine 10 and migrated to CX24. This repository's fresh, direct-CX24 installation recipe has been checked and compiled, but has **not** been tested from a clean Mac all the way into gameplay. Another Mac may need troubleshooting.
+**Status: experimental.** Gameplay was confirmed on an M1 Pro MacBook Pro running macOS 26.5.2, using the July 2, 2026 WZ client. **800×600 was smoother and playable; 1024×768 still had noticeable visual lag.** On September 14, 2026, the ready-built ZIP also completed a fresh, direct-CX24 installation on this Mac: the user logged in, loaded a character on retry, and changed maps successfully. One initial character-loading failure remains unexplained. A second Mac and its first-open security/Rosetta setup remain untested. Another Mac may need troubleshooting.
 
 This is an unofficial launcher project. It does not include the game, your account, a Windows installation, or the CrossOver application.
 
 ## Easier setup: use the ready-built preview
 
-If someone gives you **MapleRoyals-preview.zip**, follow [the short app instructions](portable/START-HERE.txt). Unzip it, open **MapleRoyals.app**, select your official Windows WZ installer, and click **Install & Play**. Complete the Windows installer once; later launches open the game automatically. Optional fullscreen helpers are already compiled in the ZIP.
+If someone gives you **MapleRoyals-preview.zip** or **MapleRoyals-hobby-preview.zip**, follow [the short app instructions](portable/START-HERE.txt). Unzip it, open **MapleRoyals.app**, select your official Windows WZ installer, and click **Install & Play**. Complete the Windows installer once; later launches open the game automatically. Optional fullscreen helpers are already compiled in the ZIP.
 
 This hobby build uses no Apple Developer account and is not notarized. You may need Apple's **Open Anyway** approval for each trusted app on first launch. See [the app guide](docs/PORTABLE_APP.md) for exact steps, tested behavior and limitations. The new app uses its own `MapleRoyalsLauncher` folder in Application Support and does not replace an older installation.
 
 **GitHub's Code → Download ZIP contains source code, not a ready-built app.** Get the compiled preview ZIP separately from the maintainer. To build that ZIP for a friend, the maintainer runs `python3 portable/build.py`. Only the build Mac needs Python and developer tools.
 
-The native setup UI, real runtime downloads and fresh Wine initialization have been tested. Completing the Windows installer through gameplay with this new app on a clean second Mac remains unverified.
+The ZIP has passed fresh runtime downloads, Windows installation, character loading on retry, map changes, and normal game shutdown on the original M1 Pro. Reopening the app started the installed game without repeating setup, and the user loaded their character again. See [the recorded ZIP test](docs/ZIP_ACCEPTANCE.md) for evidence and remaining checks; this was a fresh app installation on an existing Mac, not a clean second Mac.
 
 ## Build from source instead
 
@@ -156,7 +156,7 @@ Its virtual display is 1024×768, but the game can still be set to **800×600**.
 | No installer listed | Download the official Windows WZ installer, then drag its `.exe` into the setup prompt. |
 | Download or certificate error | Check your connection and Python installation. Keep checksum and certificate checks enabled; record the error for the maintainer. |
 | Existing installation folder | Open the existing app if setup previously finished. See the recovery instructions below if it stopped halfway. |
-| Character-selection crash or game never appears | Use **Show log** in the launcher. Record the Mac chip, macOS version, installer filename and the stage that failed. This remains an experimental compatibility setup. |
+| Character-selection crash or game never appears | One initial character-loading failure occurred in the fresh ZIP test; retrying then worked, but the cause is unknown. If it happens again, use **Show log** and record whether the whole game closed or returned to login, plus your Mac chip, macOS version and installer filename. |
 | 1024×768 is laggy | Use 800×600. Smooth 1024×768 has not been achieved on the tested M1 Pro. |
 | Picture is stuck in the top-left corner | Use the optional fullscreen helper; removing the game window border does not perform screen scaling. |
 | Mac screen is still scaled after playing | Use **Restore normal display** in the helper or quit that helper. |
@@ -187,6 +187,6 @@ For technical details, see [configuration and advanced commands](docs/CONFIGURAT
 - `display/`: optional fullscreen helper and its notices.
 - `docs/`: configuration, research results and future packaging work.
 
-The repository intentionally excludes game files, downloaded runtimes, Wine prefixes, personal logs and compiled apps. `.gitignore` helps keep those out of commits. Do not force-add them. Each person obtains the official game and builds a local launcher.
+The repository intentionally excludes game files, downloaded runtimes, Wine prefixes, personal logs and compiled apps. `.gitignore` helps keep those out of commits. Do not force-add them. Each person obtains the official game separately. They can use a compiled preview ZIP from the maintainer or build a local launcher from source.
 
-The apps built here are locally ad-hoc signed. This source-sharing workflow is different from distributing a prebuilt, notarized application. A future ready-to-download app still needs portable first-run setup, clean-machine testing, a component/source-license audit and distribution signing. See [packaging notes](docs/PACKAGING.md).
+The apps built here are locally ad-hoc signed, without an Apple Developer account. The compiled preview now provides portable first-run setup; testing on a second Mac and first-open security prompts remain outstanding. Bundling Wine instead of downloading it would also require a component/source-license audit. Developer ID signing and notarization are optional future distribution choices. See [packaging notes](docs/PACKAGING.md).

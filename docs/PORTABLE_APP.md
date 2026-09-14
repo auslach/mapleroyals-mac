@@ -2,7 +2,7 @@
 
 A maintainer can now build a ZIP containing `MapleRoyals.app`, an Intel compatibility helper inside it, two optional fullscreen apps, and `START-HERE.txt`. Recipients do not need Python, Command Line Tools, Xcode, Homebrew, Git, CrossOver, or the Sikarugir application. They still need an Apple silicon Mac, an internet connection, Rosetta when requested, their own account, and the official WZ installer.
 
-This is an experimental preview. A fresh install through gameplay on a second Mac is not yet validated. Earlier gameplay was confirmed using the migrated CX24 prefix on the original M1 Pro. Smooth 1024×768 remains unresolved.
+This is an experimental preview. A fresh direct-CX24 installation from the ZIP now reaches gameplay and map changes on the original M1 Pro, with one unexplained character-loading failure before a successful retry. A second Mac is not yet validated. Smooth 1024×768 remains unresolved.
 
 ## What the recipient does
 
@@ -78,11 +78,13 @@ build/portable-core-tests .
 - Verified all four local signatures; none has a Team Identifier. Checked the compiled minimum macOS version of every helper and launcher: 14.0. The ZIP was checked for game/runtime binaries, logs, and embedded build-user paths; none were present.
 - Checked the native first-run screen visually and selected the official WZ installer using computer use.
 - The app downloaded both real upstream archives, passed the integrity checks, unpacked them, and successfully completed fresh `wineboot -u` plus `wineserver -w`.
-- It started the official WZ installer process. Activity Monitor inspection confirmed that the process loaded the installer and libraries from the new portable runtime. The automation could not attach to Wine's Windows UI; installation through gameplay was not completed in this test.
-- Interrupted this isolated test through Activity Monitor. The launcher reported the failed process and re-enabled setup controls instead of marking the game installed. Wine child processes left by the forced interruption were stopped manually; automatic recovery from forced termination is not established.
+- An initial, intentionally interrupted setup test reached the official WZ installer. The launcher reported the failed process and re-enabled setup controls instead of marking the game installed. Wine child processes left by forced interruption were stopped manually; automatic recovery from forced termination remains unestablished.
+- A subsequent acceptance test extracted the actual shareable ZIP and started with no `MapleRoyalsLauncher` data directory. The app downloaded and initialized a fresh runtime/prefix, and the user completed the official WZ installer. Installation and registry commands exited 0.
+- The user reported one initial character-loading failure, then confirmed login, character loading on retry, and successful map changes. Activity Monitor confirmed that the game used the new prefix, pinned CX24 runtime, builtin graphics DLLs and OpenGL. The first failure has not been diagnosed.
+- Normal game shutdown and the following `wineserver -w` both exited 0. After quitting and reopening the native launcher, it started the installed game directly without downloading or installing again. The user confirmed successful character loading again after that relaunch. See [the ZIP acceptance record](ZIP_ACCEPTANCE.md).
 - Core checks passed for tampered-download rejection, wrong-installer rejection before download, exclusive ownership, portable paths, renderer-environment isolation, and preserving existing runtime data.
 
-Still unverified: a second Mac, absent-Rosetta setup, first-open prompts after internet transfer, Windows installer completion and gameplay through this new flow, sleep/wake recovery, and fullscreen helper behavior on other displays. This app reduces setup work; it does not establish new game compatibility or improve the original 1024×768 performance result.
+Still unverified: a second Mac, absent-Rosetta setup, first-open prompts after internet transfer, PIC interaction, simultaneous clients (not exposed by this app), sleep/wake recovery, and fullscreen helper behavior on other displays. This app reduces setup work; it does not resolve the first character-loading failure or improve the original 1024×768 performance result.
 
 ## Contents and licensing
 
