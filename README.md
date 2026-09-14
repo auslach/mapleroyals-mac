@@ -1,14 +1,28 @@
 # MapleRoyals on an Apple Silicon Mac
 
-Build a small Mac app that opens the Windows MapleRoyals client without installing CrossOver or using a Wine settings interface. There is a one-time setup in Terminal. After that, you open **MapleRoyals.app** to play.
+Open the Windows MapleRoyals client through a small native Mac launcher, without CrossOver or a Wine settings interface. A ready-built hobby preview can now handle first-run setup inside the app. Recipients of that preview do not need Terminal, Python or Command Line Tools. The source-build instructions are also preserved below.
 
 **Status: experimental.** Gameplay was confirmed on an M1 Pro MacBook Pro running macOS 26.5.2, using the July 2, 2026 WZ client. **800×600 was smoother and playable; 1024×768 still had noticeable visual lag.** The successful installation was originally installed with Wine 10 and migrated to CX24. This repository's fresh, direct-CX24 installation recipe has been checked and compiled, but has **not** been tested from a clean Mac all the way into gameplay. Another Mac may need troubleshooting.
 
 This is an unofficial launcher project. It does not include the game, your account, a Windows installation, or the CrossOver application.
 
+## Easier setup: use the ready-built preview
+
+If someone gives you **MapleRoyals-preview.zip**, follow [the short app instructions](portable/START-HERE.txt). Unzip it, open **MapleRoyals.app**, select your official Windows WZ installer, and click **Install & Play**. Complete the Windows installer once; later launches open the game automatically. Optional fullscreen helpers are already compiled in the ZIP.
+
+This hobby build uses no Apple Developer account and is not notarized. You may need Apple's **Open Anyway** approval for each trusted app on first launch. See [the app guide](docs/PORTABLE_APP.md) for exact steps, tested behavior and limitations. The new app uses its own `MapleRoyalsLauncher` folder in Application Support and does not replace an older installation.
+
+**GitHub's Code → Download ZIP contains source code, not a ready-built app.** Get the compiled preview ZIP separately from the maintainer. To build that ZIP for a friend, the maintainer runs `python3 portable/build.py`. Only the build Mac needs Python and developer tools.
+
+The native setup UI, real runtime downloads and fresh Wine initialization have been tested. Completing the Windows installer through gameplay with this new app on a clean second Mac remains unverified.
+
+## Build from source instead
+
+The remaining instructions are the original Terminal setup path. Skip them if you have the ready-built preview ZIP.
+
 ## What you need
 
-- An Apple Silicon Mac, such as an M1, M2, M3 or later. This prototype targets macOS 14 or newer; only the configuration above was tested. This is not a guarantee for every chip or macOS release.
+- An Apple Silicon Mac, such as an M1, M2, M3 or later. The supported target range is macOS 14–27; only the configuration above was tested. This is not a guarantee for every chip or macOS release.
 - An internet connection and space for several gigabytes of game/runtime files, plus Apple's development tools. Allowing at least 10 GB free before starting is a practical budget, not a measured minimum.
 - Your own MapleRoyals account and the official **Windows WZ installer**.
 - Apple's Command Line Tools, Python 3.9 or newer, and Rosetta. The steps below explain these. You do **not** need full Xcode, Homebrew, a paid developer account, or CrossOver.

@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='mapleroyals-display-build-', dir=output
         swift = swift.replace('fullscreen-display.log', 'fullscreen-display-120.log')
     swift_path = temp / 'FullscreenDisplay.swift'
     swift_path.write_text(swift)
-    subprocess.run(['xcrun', 'swiftc', '-O', '-module-cache-path', str(temp / 'module-cache'),
+    subprocess.run(['xcrun', 'swiftc', '-O', '-target', 'arm64-apple-macos14.0', '-module-cache-path', str(temp / 'module-cache'),
         '-import-objc-header', str(source / 'CGVirtualDisplayPrivate.h'),
         str(swift_path), '-o', str(app / 'Contents/MacOS/MapleRoyalsDisplay')], check=True)
     info = dict(CFBundleExecutable='MapleRoyalsDisplay', CFBundleIdentifier='local.mapleroyals.displaytest',

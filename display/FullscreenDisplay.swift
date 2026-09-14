@@ -13,7 +13,12 @@ final class DisplayController: NSObject, NSApplicationDelegate {
     var physicalID: CGDirectDisplayID = 0
     var previousMode: CGDisplayMode?
     var rollbackTimer: Timer?
-    let logURL = Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent("fullscreen-display.log")
+    let logURL: URL = {
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let logs = support.appendingPathComponent("MapleRoyalsLauncher/logs")
+        try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
+        return logs.appendingPathComponent("fullscreen-display.log")
+    }()
 
     func log(_ text: String) {
         let data = Data("\(Date()): \(text)\n".utf8)

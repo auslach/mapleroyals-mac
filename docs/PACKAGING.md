@@ -1,8 +1,10 @@
-# Source sharing and a future downloadable app
+# Source sharing and app packaging
 
-This repository shares source and a local build recipe. Each person downloads runtime archives from their maintainers and obtains the official Windows game installer. It is not a prebuilt app release, and no GitHub repository or release is created by these scripts.
+A native downloadable preview is now implemented in `portable/`; see [the app guide](PORTABLE_APP.md) for its build, user flow and validation. Its default hobby build uses no Apple Developer account and accepts the possibility of per-app first-open approvals. The remaining notes describe the original source recipe and optional future distribution work.
 
-For a future downloadable app, use a native first-run setup flow that checks the supported OS/Rosetta combination, provisions verified runtime artifacts, accepts the user's official game installer, and initializes a fresh prefix. Keep subsequent launches as a simple Play action. Integrate the fullscreen helper and restore the display when the game exits, including a tested recovery path for interrupted sessions.
+This repository also shares source and a local build recipe. Each person downloads runtime archives from their maintainers and obtains the official Windows game installer. It is not a prebuilt app release, and no GitHub repository or release is created by these scripts.
+
+The native preview now provides a first-run setup flow that checks the supported OS/Rosetta combination, provisions verified runtime artifacts, accepts the user's official game installer, and initializes a fresh prefix. Keep subsequent launches as a simple Play action. Integrate the fullscreen helper and restore the display when the game exits, including a tested recovery path for interrupted sessions.
 
 Suggested layout:
 
@@ -22,7 +24,7 @@ Keep mutable Windows/game state outside the signed app. Remove absolute referenc
 
 The original native launcher is under 200 KB, while the runtime and full template libraries together occupy roughly 900 MB uncompressed, excluding the multi-gigabyte game/prefix. Removing unused libraries needs a dependency and gameplay audit; do not assume a small launcher means a small complete installation.
 
-For a prebuilt download intended to open under normal Gatekeeper settings, use Developer ID signing and Apple's notarization process, including nested runtime code. Local ad-hoc signatures do not establish distribution readiness. [Apple Developer ID guidance](https://developer.apple.com/developer-id/)
+For an optional future prebuilt download intended to open without unidentified-developer exceptions, use Developer ID signing and Apple's notarization process, including nested runtime code. Local ad-hoc signatures do not establish distribution readiness. [Apple Developer ID guidance](https://developer.apple.com/developer-id/)
 
 Before bundling binaries, establish the applicable licenses and exact corresponding source for the pinned Wine build and each native dependency. Do not treat the whole Sikarugir template as LGPL: its own component statements distinguish Configure from Launcher/Creator, and its D3DMetal payload has separate restrictions. [Sikarugir component statements](https://github.com/Sikarugir-App/Sikarugir), [Wine LGPL text](https://raw.githubusercontent.com/wine-mirror/wine/master/COPYING.LIB)
 
