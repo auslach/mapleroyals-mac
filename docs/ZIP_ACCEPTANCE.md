@@ -42,4 +42,14 @@ The virtual desktop size does not establish the game's internal resolution. That
 
 A second Mac, missing-Rosetta installation, Gatekeeper prompts after an actual internet transfer, PIC interaction, long-session stability, sleep/wake and other displays remain untested. Simultaneous clients are unavailable in this launcher. The ZIP is ad-hoc signed without an Apple Developer account or Team Identifier and is not notarized.
 
-The unchanged ZIP remains the tested artifact. These documentation updates do not rebuild it or publish a GitHub release asset. See [recipient instructions](PORTABLE_APP.md) and [third-party notices](../THIRD_PARTY_NOTICES.md).
+## Repository download
+
+The ready-built package is now tracked at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip), so a repository clone includes it and the README can link directly to the download. This is a Git repository file, not a GitHub Release asset.
+
+- Repository ZIP: `MapleRoyals-Mac.zip`, 164,606 bytes.
+- SHA-256: `dc944e8c8dc6efa0dcd653c6edf1115d825a221ba1f88c893b6fc50e25841040`; also recorded in the [adjacent checksum file](../download/MapleRoyals-Mac.zip.sha256).
+- Compiled app source remains commit `c733a8e603132fee3f505efa835ecbf0f219592f`.
+- Packaging change: renamed the outer folder to `MapleRoyals-Mac` and updated root `START-HERE.txt` and build metadata outside the signed apps.
+- Every file's contents and Unix mode inside every `.app` bundle were compared with the original gameplay-tested ZIP and are identical, including the embedded Intel helper and optional fullscreen helpers. ZIP integrity and extracted app signatures were checked.
+
+The original ZIP above remains the historical gameplay-test artifact. Gameplay evidence applies to the unchanged app code/configuration; this documentation repack has not repeated gameplay or established first-open behavior on a second Mac. See [player instructions](PLAYER_GUIDE.md) and [third-party notices](../THIRD_PARTY_NOTICES.md).

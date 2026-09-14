@@ -2,12 +2,22 @@
 
 Run the Windows MapleRoyals client through a small native Mac launcher, without CrossOver or a Wine settings interface. The ready-built preview handles setup inside the app; players do not need Terminal, Python or developer tools.
 
+## Download and play
+
+**[Download MapleRoyals-Mac.zip for Apple Silicon Macs](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip)**
+
+1. Download the app ZIP above, then double-click it to unpack it.
+2. Open **MapleRoyals.app** in the unpacked folder.
+3. Follow the **[player setup instructions](docs/PLAYER_GUIDE.md)** to download the official Windows WZ game installer and complete first-time setup.
+
+**Already cloned this repository?** Open **[download/MapleRoyals-Mac.zip](download/MapleRoyals-Mac.zip)** in your local repository folder. It is the same ready-built app; no build commands are needed. If you used GitHub's **Code → Download ZIP**, unpack that repository archive first, then open the app ZIP inside its **download** folder.
+
+This repository is currently private. Sign in to GitHub with an account that has access to use the download link.
+
 ## Choose your guide
 
 - **[Player guide: install and play](docs/PLAYER_GUIDE.md)** — get the right ZIP, complete first-time setup, launch the game, use fullscreen, and restore your normal Mac display. Written for people who just want to play.
 - **[Developer guide: build and extend the project](docs/DEVELOPER_GUIDE.md)** — prerequisites, building a shareable ZIP, source layout, runtime configuration, development checks, and the older Terminal setup route.
-
-**Get the compiled app ZIP from the maintainer.** GitHub's **Code → Download ZIP** downloads source code, not a ready-to-run app. The player guide explains the difference.
 
 ## Fullscreen
 

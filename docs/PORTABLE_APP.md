@@ -1,6 +1,6 @@
 # Portable app implementation and validation
 
-A maintainer can now build a ZIP containing `MapleRoyals.app`, an Intel compatibility helper inside it, two optional fullscreen apps, and `START-HERE.txt`. Recipients do not need Python, Command Line Tools, Xcode, Homebrew, Git, CrossOver, or the Sikarugir application. They still need an Apple silicon Mac, an internet connection, Rosetta when requested, their own account, and the official WZ installer.
+The repository includes a ready-built [app ZIP](../download/MapleRoyals-Mac.zip) containing `MapleRoyals.app`, an Intel compatibility helper inside it, two optional fullscreen apps, and `START-HERE.txt`. Recipients do not need Python, Command Line Tools, Xcode, Homebrew, Git, CrossOver, or the Sikarugir application. They still need an Apple silicon Mac, an internet connection, Rosetta when requested, their own account, and the official WZ installer.
 
 This is an experimental preview. A fresh direct-CX24 installation from the ZIP now reaches gameplay and map changes on the original M1 Pro, with one unexplained character-loading failure before a successful retry. A second Mac is not yet validated. Smooth 1024×768 remains unresolved.
 

@@ -28,6 +28,8 @@ work/
 *.pkg
 *.dmg
 *.zip
+# The small native app package is intentionally included for players.
+!/download/MapleRoyals-Mac.zip
 *.tar
 *.tar.*
 

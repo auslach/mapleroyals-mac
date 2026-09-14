@@ -42,7 +42,9 @@ python3 portable/build.py --output dist/MapleRoyals-preview-next
 
 The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatibility helper, both compiled fullscreen display helpers, `START-HERE.txt`, configuration, notices and build information. The recipient downloads the official game separately; on first run the app downloads about 260 MB of pinned runtime archives and initializes its own Wine prefix.
 
-**Share the compiled ZIP with players.** GitHub's **Code → Download ZIP** is source code. The build script does not upload a GitHub release. For now the maintainer supplies the compiled ZIP separately; attaching a tested build to a release is a separate publishing action.
+**The ready-to-run player download is tracked at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip).** A clone and GitHub's Code → Download ZIP both include this app archive. The README also links directly to its download. Players do not build the app.
+
+The builder writes new builds to ignored `dist/` outputs; it does not automatically replace the tracked download or publish a GitHub release. To update the player download, build into a new output directory, validate the package and gameplay, then replace the single tracked ZIP, update its adjacent SHA-256 file and [acceptance record](ZIP_ACCEPTANCE.md), and commit them with any changed setup instructions. The current tracked package contains the previously tested app bundles unchanged, with updated documentation outside the bundles; its acceptance record distinguishes those two artifacts.
 
 The default build uses ad-hoc signatures and no Apple Developer account, Team Identifier or notarization credentials. `--identity` exists for a future explicitly chosen Developer ID build; it never selects an identity automatically or notarizes/uploads anything. The current hobby workflow deliberately does not require a business Apple identity. See [packaging and licensing notes](PACKAGING.md) before changing distribution strategy.
 
@@ -55,6 +57,7 @@ The default build uses ad-hoc signatures and no Apple Developer account, Team Id
 | [`portable/RosettaCheck.swift`](../portable/RosettaCheck.swift) | Tiny Intel-only helper that can trigger Apple's Rosetta installation prompt. |
 | [`portable/build.py`](../portable/build.py) | Compile, sign and package the portable app and helpers. |
 | [`portable/START-HERE.txt`](../portable/START-HERE.txt) | Short player instructions included in generated ZIPs. Keep these consistent with the player guide. |
+| [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip) | Tracked ready-built player download, with an adjacent SHA-256 checksum. |
 | [`assets.json`](../assets.json) | Pinned upstream runtime/template URLs, sizes and SHA-256 hashes. |
 | [`settings.reg`](../settings.reg) | Windows version, graphics, desktop and initial game window settings. |
 | [`display/FullscreenDisplay.swift`](../display/FullscreenDisplay.swift) | Separate native virtual-display/mirroring helper with Test, Keep and Restore controls. |
@@ -162,8 +165,8 @@ An error about missing `setup.py` means the command was run outside the reposito
 
 ## Distribution boundaries
 
-Keep game assets, used prefixes, personal logs, downloaded runtime archives and compiled apps out of Git. `.gitignore` excludes them; do not force-add them. Each player obtains the official game separately. No permission to redistribute MapleRoyals/Nexon assets was established.
+Keep game assets, used prefixes, personal logs and downloaded Wine/template archives out of Git. `.gitignore` excludes them and ordinary build outputs. Its single ZIP exception is `/download/MapleRoyals-Mac.zip`, the intentionally published native launcher/helper package; do not broaden that exception or force-add other binaries. Each player obtains the official game separately. No permission to redistribute MapleRoyals/Nexon assets was established.
 
 The current ZIP provisions runtime archives from upstream instead of bundling them. Before redistributing Wine or template components, audit each component's license and exact corresponding source; the entire Sikarugir template must not be assumed to have one license. See [third-party notices](../THIRD_PARTY_NOTICES.md) and [packaging notes](PACKAGING.md).
 
-Documentation changes alone do not rebuild an already distributed ZIP. Changes to `portable/START-HERE.txt` appear in the next build. Preserve the artifact/hash distinction when updating the acceptance record, and test newly built software before presenting it as validated.
+Documentation changes alone do not update an already distributed ZIP. Future builds include the current `portable/START-HERE.txt`; if documentation is repackaged around an existing tested build, preserve every file inside its signed app bundles, verify their signatures and file hashes, and record the new archive hash separately. Test changed executable code before presenting a build as gameplay-validated.

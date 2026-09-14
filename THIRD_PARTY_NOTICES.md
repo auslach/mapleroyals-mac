@@ -1,6 +1,6 @@
 # Third-party components and scope
 
-This source folder contains the native launcher, local provisioning scripts, documentation and optional display-helper sources. It does not contain Wine binaries, game files, installed Microsoft redistributables, or the Sikarugir application bundle.
+This repository contains the native launcher, local provisioning scripts, documentation, optional display-helper sources, and a ready-built native launcher/helper ZIP at `download/MapleRoyals-Mac.zip`. It does not contain Wine binaries, game files, installed Microsoft redistributables, or the Sikarugir application bundle.
 
 ## Included material
 
@@ -14,4 +14,4 @@ Wine is distributed under LGPL terms. Other runtime libraries and Sikarugir comp
 
 The game and its Windows redistributables come from the installer selected by the user. No ownership or redistribution rights in MapleRoyals/Nexon assets are claimed. Obtain the game from [the official download page](https://royals.ms/downloads). Do not upload installed game folders or user prefixes to this repository.
 
-Rosetta and Apple's Command Line Tools are installed separately through Apple. They are not bundled here. The source-build process locally ad-hoc signs generated apps; it does not notarize them or create a distributable release.
+Rosetta and Apple's Command Line Tools are installed separately through Apple. They are not bundled here. The default build locally ad-hoc signs generated apps. The tracked hobby app ZIP is not notarized and uses no Apple Developer account. The build script does not publish a GitHub Release.

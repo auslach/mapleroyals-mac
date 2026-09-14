@@ -2,18 +2,26 @@
 
 [Back to the README](../README.md) · [Developer guide](DEVELOPER_GUIDE.md)
 
-Use this guide if someone has given you the ready-built MapleRoyals app ZIP. You do **not** need Terminal, Python, Xcode, Command Line Tools, Homebrew, CrossOver, or Sikarugir.
+Download the app from this repository and follow the steps below. You do **not** need Terminal, Python, Xcode, Command Line Tools, Homebrew, CrossOver, or Sikarugir.
 
 ## What you need
 
 - An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Only an M1 Pro on macOS 26.5.2 has been gameplay-tested; another Mac may need troubleshooting.
 - An internet connection and about 10 GB of free space before setup. This is a practical allowance, not a measured minimum.
 - Your own MapleRoyals account and the official **Windows WZ installer**.
-- The ready-built app ZIP supplied by the maintainer.
+- [MapleRoyals-Mac.zip](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip), available directly from this repository.
 
 ## 1. Get the app and game installer
 
-Ask the person sharing this project for **MapleRoyals-hobby-preview.zip** or **MapleRoyals-preview.zip**. Double-click the ZIP to unpack it. Inside the resulting folder you will find:
+**[Click here to download MapleRoyals-Mac.zip for Apple Silicon Macs](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip).** This is the ready-built app with both optional fullscreen helpers.
+
+This repository is currently private. If the link asks you to sign in or shows **404 / Not Found**, sign in to a GitHub account with access to this repository.
+
+**If you already cloned the repository:** in Finder, open your local repository folder, then **download → MapleRoyals-Mac.zip**. Use that included ZIP; you do not need to build anything or download another copy.
+
+**If you downloaded the whole repository using Code → Download ZIP:** double-click the repository archive to unpack it, then open **download → MapleRoyals-Mac.zip** inside the unpacked repository folder.
+
+Double-click **MapleRoyals-Mac.zip** to unpack it. Open the resulting **MapleRoyals-Mac** folder, which contains:
 
 ```text
 MapleRoyals.app
@@ -24,8 +32,6 @@ START-HERE.txt
 ```
 
 There may also be a build information file; you can leave it alone. Keep the **Optional fullscreen** folder if you want to use fullscreen later. Move **MapleRoyals.app** into Applications, or another folder you intend to keep. You can move the optional display apps there too.
-
-**GitHub's Code → Download ZIP is different:** it gives you the project's source files. If you see files such as `setup.py` and no ready-built `MapleRoyals.app`, ask the maintainer for the compiled app ZIP. You do not need to build it yourself.
 
 Go to the [official MapleRoyals downloads page](https://royals.ms/downloads) and download the **Windows WZ** installer into Downloads. Leave it as an `.exe` file; do not try to open or extract it in Finder. You only need WZ for this setup. IMG was not tested. The tested file was `MapleRoyalsSetupWz-02.07.26.exe`; newer releases may behave differently.
 
@@ -78,7 +84,7 @@ The helper was tested on the M1 Pro's built-in display. Other displays, sleep/wa
 
 ## If macOS blocks the first open
 
-This hobby preview uses no Apple Developer account and is not notarized. If macOS says the developer is unidentified or Apple cannot check the app, and you trust the person who supplied this unchanged copy:
+This hobby preview uses no Apple Developer account and is not notarized. If macOS says the developer is unidentified or Apple cannot check the app, and you trust this unchanged app downloaded from this repository:
 
 1. Attempt to open the app once.
 2. Open **System Settings → Privacy & Security**.
@@ -92,7 +98,8 @@ Do not disable system security or override a malware/damaged-app warning. Work o
 
 | What you see | What to do |
 |---|---|
-| Source files but no app | Get the compiled preview ZIP from the maintainer; GitHub's Code → Download ZIP contains source code. |
+| Download link shows 404 / Not Found | This repository is private. Sign in to GitHub with an account that has access. |
+| Source files but no app | Open **download → MapleRoyals-Mac.zip** in the repository folder and unpack that ZIP. You do not need to run `setup.py`. |
 | Setup stopped partway through | Close the game and installer, quit the launcher, then reopen it and choose the official installer again if asked. Keep the installer until setup finishes. If the problem repeats, use **Show log** and contact the maintainer. |
 | The game fails when selecting a character | One initial failure occurred during testing, followed by a successful retry. Its cause is unknown. If it repeats, report whether the entire game closed or it returned to login. |
 | 1024×768 feels laggy | Use **800×600**. Fullscreen scaling does not fix this rendering-performance difference. |

@@ -2,7 +2,7 @@
 
 A native downloadable preview is implemented in `portable/`. See the [developer guide](DEVELOPER_GUIDE.md) for building it, the [player guide](PLAYER_GUIDE.md) for recipient instructions, and the [portable implementation reference](PORTABLE_APP.md) for lifecycle and validation. Its default hobby build uses no Apple Developer account and accepts the possibility of per-app first-open approvals. The remaining notes describe the original source recipe and optional future distribution work.
 
-This repository also shares source and a local build recipe. Each person downloads runtime archives from their maintainers and obtains the official Windows game installer. It is not a prebuilt app release, and no GitHub repository or release is created by these scripts.
+This repository includes a ready-built app archive at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip), alongside source and build recipes. Clones and repository ZIP downloads contain that archive. The app downloads runtime archives from their maintainers, and each player obtains the official Windows game installer separately. This is a tracked repository download; the scripts do not create a GitHub Release or publish builds automatically.
 
 The native preview now provides a first-run setup flow that checks the supported OS/Rosetta combination, provisions verified runtime artifacts, accepts the user's official game installer, and initializes a fresh prefix. Keep subsequent launches as a simple Play action. Integrate the fullscreen helper and restore the display when the game exits, including a tested recovery path for interrupted sessions.
 

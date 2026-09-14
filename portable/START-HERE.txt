@@ -1,57 +1,73 @@
 MAPLEROYALS FOR MAC — EXPERIMENTAL PREVIEW
 
-You do not need Terminal, Python, Xcode, Command Line Tools, Homebrew or CrossOver.
-Use an Apple silicon Mac running macOS 14–27. Only an M1 Pro has been gameplay-tested.
-Keep about 10 GB free for the runtime, downloads and game; this is a practical budget.
-
-FIRST TIME
-1. Unzip the folder and move MapleRoyals.app into Applications (or a folder you keep).
-2. Download the Windows WZ installer from https://royals.ms/downloads.
-   Keep it as an .exe. You do not need the IMG installer.
-3. Open MapleRoyals.app. If needed, click Enable Rosetta, complete Apple's prompt,
-   and click Check again.
+START HERE
+1. Open MapleRoyals.app in this folder. You can move it to Applications first.
+2. Download the official Windows WZ installer from https://royals.ms/downloads.
+   Leave it as an .exe; do not open it in Finder. You do not need IMG.
+3. If the launcher asks for Rosetta, click Enable Rosetta, complete Apple's
+   prompt yourself, then return and click Check again.
 4. Click Choose game installer, select the WZ .exe, then click Install & Play.
-   The app downloads and checks about 260 MB of support files.
+   Leave the launcher open while it downloads about 260 MB of support files.
 5. Complete the Windows installer, keeping C:\MapleRoyals as the destination.
-   Complete included Visual C++ installer prompts. Turn OFF Launch MapleRoyals
-   in the installer before clicking Finish. Our app will start the game.
-6. Sign in with your own account. Start at 800x600 for the smoother tested result.
+   Complete included Visual C++ prompts. Turn OFF Launch MapleRoyals in the
+   installer before clicking Finish. Our launcher then starts the game.
+6. Sign in with your own account. Start with 800x600 for smoother performance.
+
+You do not need Terminal, Python, Xcode, Command Line Tools, Homebrew or CrossOver.
+Use an Apple Silicon Mac running macOS 14–27 and allow about 10 GB free for setup.
+Only an M1 Pro on macOS 26.5.2 has been gameplay-tested.
+
+GETTING THIS APP
+The repository includes this ready-built ZIP at download/MapleRoyals-Mac.zip.
+If you cloned the repository or unpacked its Code > Download ZIP archive, open
+that file in its download folder. You do not need to build anything.
+Direct app download:
+https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip
+Full player guide:
+https://github.com/auslach/mapleroyals-mac/blob/main/docs/PLAYER_GUIDE.md
 
 NEXT TIME
 Open MapleRoyals.app. It starts the installed game automatically.
+If the launcher is still open after a session, click Play.
 Keep the launcher open while playing. Close the game before quitting the launcher.
-The launcher does not yet support a second simultaneous client.
+The launcher supports one game client at a time.
 
-OPTIONAL FULLSCREEN WITH SIDE BARS
-The Optional fullscreen folder includes two ready-built helpers. Use the 60 Hz
-helper first; the 120 Hz version is intended for a compatible ProMotion MacBook Pro.
-Close the game, open one helper, click Test, then Keep within 20 seconds.
-Keep the helper open, open the game, and use Option+Return if needed.
-After playing, close the game and use Restore normal display or quit the helper.
-This temporarily affects the whole built-in screen. It does not fix 1024x768 lag.
-Do not run both display helpers together.
+FULLSCREEN WITH BLACK SIDE BARS
+The Optional fullscreen folder contains separate, ready-built display apps.
+1. Close the game first.
+2. Open MapleRoyals Display 60 Hz.app. The 120 Hz app is for a compatible
+   ProMotion MacBook Pro. Run only one display app at a time.
+3. Click Test 1024x768 display, then Keep this display within 20 seconds.
+   If you do nothing, your display returns to normal automatically.
+4. Leave the display app open, launch MapleRoyals, and use Option+Return inside
+   the game if needed. The game can still use 800x600 for better performance.
+5. After playing, close the game, then click Restore normal display in the
+   display app, or quit that display app with Command+Q.
 
-YOUR FILES
-The game and downloaded runtime are saved in your account under:
+This scales the WHOLE Mac screen while active, including other apps. Closing the
+game alone does not restore your screen. It does not fix 1024x768 game lag.
+
+IF MACOS BLOCKS FIRST OPEN
+This hobby app uses no Apple Developer account and is not notarized. If the
+warning says the developer is unidentified or Apple cannot check the app, and
+you trust this unchanged copy from the repository:
+1. Attempt to open the app once.
+2. Go to System Settings > Privacy & Security.
+3. Find the notice for this app, click Open Anyway, then confirm Open.
+The Rosetta/display helpers may need their own first-open approval.
+Do not disable system security or override a malware/damaged-app warning.
+Managed Macs may not permit these exceptions. Apple's instructions:
+https://support.apple.com/en-us/102445
+
+YOUR FILES AND SUPPORT
+Your installed game lives in your account under:
 ~/Library/Application Support/MapleRoyalsLauncher
-Moving the .app does not move or delete this game folder.
-Your account and game assets are not included in the ZIP. No account data is uploaded
-by this launcher. Normal game network connections still occur.
+Moving the app does not move or delete this game data.
+No game assets, Wine runtime, used prefix or account data are included in this ZIP.
+The app downloads the Wine runtime separately. Normal game network connections occur.
 
-PREVIEW LIMITS
-This hobby preview is locally signed without an Apple Developer ID and is not
-notarized. No Apple Developer account is used.
-If macOS blocks the first launch because the developer is unidentified or Apple
-cannot check it, and you trust the person who gave you the unchanged app:
-1. After attempting to open it, open System Settings > Privacy & Security.
-2. Find the notice for this app and click Open Anyway, then confirm Open.
-The Rosetta helper or fullscreen helper may need their own first-open approval.
-Apple documents this per-app exception: https://support.apple.com/en-us/102445
-Do not disable system security or ignore a malware/damaged-app warning.
-Managed Macs can prevent these exceptions. The downloaded Wine runtime can also
-encounter separate macOS permissions; send any unexpected warning to the maintainer.
-
-The fresh installation flow has not yet been validated through gameplay on a second
-Mac. The earlier M1 Pro installation worked at 800x600; 1024x768 still lagged.
-Use Show log if something fails, and send the maintainer the error after reviewing
-for private details. Never share your password or PIC.
+Fresh installation, character loading on retry, map changes and reopening passed
+on the original M1 Pro. One initial character-loading failure is unexplained.
+Another Mac, first-open security/Rosetta prompts and long sessions remain untested.
+Use Show log if something fails. Review logs for private details before sharing;
+never share your password or PIC. Full instructions are at the player-guide link above.
