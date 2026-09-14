@@ -1,5 +1,7 @@
 # Experimental fullscreen display helper
 
+Players using the compiled ZIP should follow the [fullscreen instructions in the player guide](../docs/PLAYER_GUIDE.md#fullscreen-with-black-side-bars). The notes below are for developers building or changing the helper.
+
 Build with `python3 build.py --output /your/output/MapleRoyals-Display.app`, then open the generated app in Finder. The app does not change the display until its Test button is pressed.
 
 Add `--refresh-hz 120` to build the 120 Hz comparison used on this M1 Pro's 120 Hz panel. Both source variants compiled and signed locally; the build recipe was also compiled and signed for the 60 Hz variant. Do not run both helpers' display tests at once.

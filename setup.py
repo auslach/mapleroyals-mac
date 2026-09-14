@@ -91,7 +91,7 @@ def main():
         print("\nAn installation folder already exists:", DEFAULT_DATA)
         if (DEFAULT_DATA / "MapleRoyals.app/Contents/MacOS/MapleRoyals").is_file():
             print("Open MapleRoyals.app there to finish installation or play; do not run setup again.")
-        raise RuntimeError("Nothing was overwritten. See 'Setup stopped halfway' in README.md for recovery.")
+        raise RuntimeError("Nothing was overwritten. See 'Setup stopped halfway' in docs/DEVELOPER_GUIDE.md for recovery.")
     command = [sys.executable, str(HERE / "prepare.py"), "--installer", str(installer),
                "--data-dir", str(DEFAULT_DATA), "--performance"]
     if args.plan:
@@ -109,7 +109,7 @@ def main():
     print("\nBuild finished. The Windows game has not been installed by this Terminal command yet.")
     print("In Finder, press Shift-Command-G and paste this folder:")
     print(DEFAULT_DATA)
-    print("Open MapleRoyals.app and follow README.md step 5 to complete the game installer.")
+    print("Open MapleRoyals.app and follow 'Finish the local game installation' in docs/DEVELOPER_GUIDE.md.")
     print("Keep this Application Support folder in place. Later launches need no Terminal.")
 
 

@@ -1,6 +1,6 @@
 # Configuration and advanced setup
 
-Use the [main README](../README.md) for normal installation. The following describes the generated performance profile and the measured local result.
+For normal installation, use the [player guide](PLAYER_GUIDE.md). For building or extending the project, start with the [developer guide](DEVELOPER_GUIDE.md). This reference describes the older local source recipe and its generated performance profile; the portable app uses the same graphics choices with a different data layout documented in the [portable implementation reference](PORTABLE_APP.md).
 
 ## Runtime configuration
 

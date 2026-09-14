@@ -1,6 +1,6 @@
 # Source sharing and app packaging
 
-A native downloadable preview is now implemented in `portable/`; see [the app guide](PORTABLE_APP.md) for its build, user flow and validation. Its default hobby build uses no Apple Developer account and accepts the possibility of per-app first-open approvals. The remaining notes describe the original source recipe and optional future distribution work.
+A native downloadable preview is implemented in `portable/`. See the [developer guide](DEVELOPER_GUIDE.md) for building it, the [player guide](PLAYER_GUIDE.md) for recipient instructions, and the [portable implementation reference](PORTABLE_APP.md) for lifecycle and validation. Its default hobby build uses no Apple Developer account and accepts the possibility of per-app first-open approvals. The remaining notes describe the original source recipe and optional future distribution work.
 
 This repository also shares source and a local build recipe. Each person downloads runtime archives from their maintainers and obtains the official Windows game installer. It is not a prebuilt app release, and no GitHub repository or release is created by these scripts.
 

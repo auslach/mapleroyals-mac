@@ -1,4 +1,4 @@
-# Ready-built hobby preview
+# Portable app implementation and validation
 
 A maintainer can now build a ZIP containing `MapleRoyals.app`, an Intel compatibility helper inside it, two optional fullscreen apps, and `START-HERE.txt`. Recipients do not need Python, Command Line Tools, Xcode, Homebrew, Git, CrossOver, or the Sikarugir application. They still need an Apple silicon Mac, an internet connection, Rosetta when requested, their own account, and the official WZ installer.
 
@@ -6,14 +6,7 @@ This is an experimental preview. A fresh direct-CX24 installation from the ZIP n
 
 ## What the recipient does
 
-1. Unzip the supplied preview ZIP and move `MapleRoyals.app` to a folder they keep, such as Applications.
-2. Download the official Windows WZ installer from [MapleRoyals](https://royals.ms/downloads).
-3. Open the app. If requested, use **Enable Rosetta**, complete Apple's prompt, then **Check again**.
-4. Use **Choose game installer…**, select the WZ `.exe`, then **Install & Play**.
-5. Complete the official Windows installer, keeping `C:\MapleRoyals`. Turn off its launch-game checkbox before Finish. The launcher applies the configuration and starts the game.
-6. On later visits, open the app to start the installed game automatically.
-
-The GitHub **Code → Download ZIP** button supplies source code, not this compiled ZIP. The maintainer must send the built ZIP separately or upload it as a release asset. No release is uploaded by the build script.
+The [player guide](PLAYER_GUIDE.md) contains first-run setup, macOS approvals, everyday play and the complete fullscreen Test/Keep/Restore instructions. The [developer guide](DEVELOPER_GUIDE.md) covers building and sharing the compiled ZIP. The sections below describe implementation details and validation.
 
 ## No Apple Developer account
 
@@ -55,22 +48,7 @@ The launcher stays open while setup/game processes run. Close the game before qu
 
 ## Build the ZIP (maintainer only)
 
-From the repository folder on the build Mac:
-
-```sh
-python3 portable/build.py
-```
-
-This creates `dist/MapleRoyals-preview/` and `dist/MapleRoyals-preview.zip`. The default build needs no Apple login. Existing outputs are not overwritten; choose `--output` with a new folder name when rebuilding. The builder also supports an explicit `--identity` for a future separately authorized Developer ID build; it never chooses an identity automatically and never notarizes or uploads anything.
-
-To run the core regression checks without downloading or running the game:
-
-```sh
-mkdir -p build
-xcrun swiftc -swift-version 5 -O -module-cache-path build/module-cache \
-  portable/PortableCore.swift tests/PortableCoreTests.swift -o build/portable-core-tests
-build/portable-core-tests .
-```
+Use the [developer build instructions](DEVELOPER_GUIDE.md#build-the-shareable-app-zip) and [development checks](DEVELOPER_GUIDE.md#development-checks). The builder creates a compiled app ZIP; it does not publish a GitHub release.
 
 ## Validation on September 14, 2026
 
