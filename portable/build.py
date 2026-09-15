@@ -20,8 +20,8 @@ def bundle(path, executable, identifier, name, **extra):
     (path / 'Contents/MacOS').mkdir(parents=True)
     (path / 'Contents/Resources').mkdir()
     info = dict(CFBundleExecutable=executable, CFBundleIdentifier=identifier,
-                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.6.0',
-                CFBundleShortVersionString='0.6.0', LSMinimumSystemVersion='14.0',
+                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.6.1',
+                CFBundleShortVersionString='0.6.1', LSMinimumSystemVersion='14.0',
                 NSHighResolutionCapable=True, **extra)
     (path / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
 
@@ -63,7 +63,7 @@ def main():
             run('codesign', *signing, target)
             run('codesign', '--verify', '--strict', target)
         (stage / 'BUILD-INFO.json').write_text(json.dumps({
-            'version': '0.6.0', 'architecture': 'arm64', 'minimum_macos': '14.0',
+            'version': '0.6.1', 'architecture': 'arm64', 'minimum_macos': '14.0',
             'signature': 'Developer ID' if args.identity else 'ad-hoc',
             'notarized': False, 'contains_game_or_wine_binaries': False,
             'recipient_needs_python_or_command_line_tools': False,

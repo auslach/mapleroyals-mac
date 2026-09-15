@@ -6,7 +6,7 @@ Download the app from this repository and follow the steps below. You do **not**
 
 ## What you need
 
-- An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Only an M1 Pro on macOS 26.5.2 has been gameplay-tested; another Mac may need troubleshooting.
+- An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0; another Mac may need troubleshooting. macOS 27 requires the updated launcher 0.6.1.
 - An internet connection and about 10 GB of free space before setup. This is a practical allowance, not a measured minimum.
 - Your own MapleRoyals account and the official **Windows WZ installer**.
 - [MapleRoyals-Mac.zip](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip), available directly from this repository.
@@ -52,6 +52,16 @@ If the launcher says Rosetta is needed, click **Enable Rosetta**. Complete Apple
 
 If macOS asks for access to Downloads so the app can read the installer you selected, allow that access if it matches what you are doing. Keep passwords and your PIC inside the game; never send them in chat, logs, or GitHub issues.
 
+## Updating an existing installation
+
+If the app stopped showing a game window after a macOS 27 upgrade, get the current ZIP from [the same download link](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip). It contains launcher **0.6.1**, which fixes the startup order.
+
+1. Close the game normally and quit the old launcher.
+2. Unpack the new ZIP. Replace the old **MapleRoyals.app** with the new one, wherever you keep it.
+3. Open the new app. It finds the game already installed in your Mac account. You do not need the installer again. The first tested launch after updating took about 90 seconds; leave the launcher open while it starts.
+
+Keep `~/Library/Application Support/MapleRoyalsLauncher` in place. Replacing the app does not replace or delete your game data. This update fixes startup; it does not claim to improve 1024×768 performance.
+
 ## Playing next time
 
 Open the same **MapleRoyals.app**. It starts the installed game without repeating setup. If the small launcher is already open after a game session, click **Play**.
@@ -80,7 +90,7 @@ The **display helper** is a separate small Mac app included in the ZIP. It tempo
 
 Closing the game alone does **not** stop the helper. If your desktop still has side bars afterward, return to the helper and restore it. You can reopen and use the same helper on your next session. If macOS blocks a helper's first launch, use the first-open instructions below for that app too.
 
-The helper was tested on the M1 Pro's built-in display. Other displays, sleep/wake and unexpected crashes have not been fully tested. It does not fix the slower 1024×768 game performance.
+The helper was tested on the M1 Pro's built-in display on macOS 26.5.2; it has not been revalidated on macOS 27. Other displays, sleep/wake and unexpected crashes have not been fully tested. It does not fix the slower 1024×768 game performance.
 
 ## If macOS blocks the first open
 
@@ -101,6 +111,7 @@ Do not disable system security or override a malware/damaged-app warning. Work o
 | Download link shows 404 / Not Found | This repository is private. Sign in to GitHub with an account that has access. |
 | Source files but no app | Open **download → MapleRoyals-Mac.zip** in the repository folder and unpack that ZIP. You do not need to run `setup.py`. |
 | Setup stopped partway through | Close the game and installer, quit the launcher, then reopen it and choose the official installer again if asked. Keep the installer until setup finishes. If the problem repeats, use **Show log** and contact the maintainer. |
+| No game window after upgrading to macOS 27 | Follow **Updating an existing installation** above. Use launcher 0.6.1; do not delete or reinstall your game data. |
 | The game fails when selecting a character | One initial failure occurred during testing, followed by a successful retry. Its cause is unknown. If it repeats, report whether the entire game closed or it returned to login. |
 | 1024×768 feels laggy | Use **800×600**. Fullscreen scaling does not fix this rendering-performance difference. |
 | The game stays small in the top-left corner | Follow the fullscreen helper steps above. The game's fullscreen toggle alone did not scale correctly on the tested Mac. |

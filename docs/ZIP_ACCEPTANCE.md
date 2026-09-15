@@ -53,3 +53,7 @@ The ready-built package is now tracked at [`download/MapleRoyals-Mac.zip`](../do
 - Every file's contents and Unix mode inside every `.app` bundle were compared with the original gameplay-tested ZIP and are identical, including the embedded Intel helper and optional fullscreen helpers. ZIP integrity and extracted app signatures were checked.
 
 The original ZIP above remains the historical gameplay-test artifact. Gameplay evidence applies to the unchanged app code/configuration; this documentation repack has not repeated gameplay or established first-open behavior on a second Mac. See [player instructions](PLAYER_GUIDE.md) and [third-party notices](../THIRD_PARTY_NOTICES.md).
+
+## September 15: launcher 0.6.1 on macOS 27
+
+The current tracked download is version 0.6.1, with an explicit Explorer-first launch to address the no-window startup failure after the OS upgrade. The earlier checks above describe the historical ZIP and macOS 26.5.2 test; their checksums are not those of the current download. See [the macOS 27 diagnosis and validation limits](MACOS_27.md). The current ZIP SHA-256 is in [download/MapleRoyals-Mac.zip.sha256](../download/MapleRoyals-Mac.zip.sha256).

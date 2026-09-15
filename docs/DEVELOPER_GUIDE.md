@@ -76,14 +76,14 @@ The portable launcher calculates paths from the current user's Application Suppo
   installation.json
 ```
 
-The portable app can move without relocating its data. It does not import the older `MapleRoyals-PoC` installation. On first run it verifies and provisions the runtime, runs the user's official installer, applies settings, and writes the installed marker only after success. Later launches execute the installed game directly. The launcher stays open while the game runs and currently permits one client at a time. See [portable implementation details](PORTABLE_APP.md) for lifecycle and failure behavior.
+The portable app can move without relocating its data. It does not import the older `MapleRoyals-PoC` installation. On first run it verifies and provisions the runtime, runs the user's official installer, applies settings, and writes the installed marker only after success. Later launches start Wine Explorer, which initializes the window system before starting the installed game. The launcher stays open while the game runs and currently permits one client at a time. See [portable implementation details](PORTABLE_APP.md) for lifecycle and failure behavior.
 
 ### Working runtime configuration
 
 The tested configuration is `WS12WineCX24.0.7_5` plus Template 1.0.15 native libraries under Rosetta, using a `win64` WoW64 prefix for the 32-bit Windows client. It keeps the game executable unchanged.
 
 - Windows 7; builtin Direct3D 8 → WineD3D → OpenGL; Direct3D `renderer=gl` and `csmt` DWORD 0.
-- `WINEARCH=win64`, `WINEMSYNC=1`, `WINEESYNC=0`, `WINEDEBUG=-all`, `WINEDLLOVERRIDES=mscoree,mshtml=`.
+- `WINEARCH=win64`, `WINEMSYNC=1`, `WINEESYNC=0`, `WINEDEBUG=-all,err+all`, `WINEDLLOVERRIDES=mscoree,mshtml=`.
 - Explicit per-user `WINEPREFIX`, matching `WINESERVER`, runtime `PATH`, and template Frameworks plus `/usr/lib` in `DYLD_FALLBACK_LIBRARY_PATH`.
 - Wine desktop registry set to 1024×768; this does not establish the game's actual viewport or the physical display resolution.
 - No custom `iphlpapi.dll`, DXVK, D9VK or D3DMetal activated.
@@ -91,8 +91,10 @@ The tested configuration is `WS12WineCX24.0.7_5` plus Template 1.0.15 native lib
 The launch command is passed as a process argument array, with the installed game directory as the working directory:
 
 ```text
-wine C:\MapleRoyals\MapleRoyals.exe
+wine explorer /desktop=MapleRoyals,1024x768 C:\MapleRoyals\MapleRoyals.exe
 ```
+
+The desktop-first launch avoids the initialization failure observed on macOS 27; see [diagnosis and test results](MACOS_27.md). Errors remain enabled in the normal Wine log. Wine also labels its experimental WoW64 and renderer announcements as errors, so an `err:` line alone does not establish a failed launch.
 
 The original [configuration reference](CONFIGURATION.md) documents the older route's generated paths and advanced commands. The portable path construction and environment are in `PortableCore.swift`; do not copy workspace-specific paths into a distributable app.
 

@@ -15,7 +15,8 @@ START HERE
 
 You do not need Terminal, Python, Xcode, Command Line Tools, Homebrew or CrossOver.
 Use an Apple Silicon Mac running macOS 14–27 and allow about 10 GB free for setup.
-Only an M1 Pro on macOS 26.5.2 has been gameplay-tested.
+Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0.
+This is launcher version 0.6.1.
 
 GETTING THIS APP
 The repository includes this ready-built ZIP at download/MapleRoyals-Mac.zip.
@@ -25,6 +26,12 @@ Direct app download:
 https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip
 Full player guide:
 https://github.com/auslach/mapleroyals-mac/blob/main/docs/PLAYER_GUIDE.md
+
+UPDATING AN EXISTING INSTALLATION
+If no game window appears after upgrading to macOS 27, this version fixes the
+startup order. Close the game and quit the old launcher. Replace your old
+MapleRoyals.app with the one in this ZIP, then open it. It reuses the existing
+game installation; do not delete the game data folder or reinstall the game.
 
 NEXT TIME
 Open MapleRoyals.app. It starts the installed game automatically.
@@ -46,6 +53,7 @@ The Optional fullscreen folder contains separate, ready-built display apps.
 
 This scales the WHOLE Mac screen while active, including other apps. Closing the
 game alone does not restore your screen. It does not fix 1024x768 game lag.
+The optional fullscreen helpers have not been revalidated on macOS 27.
 
 IF MACOS BLOCKS FIRST OPEN
 This hobby app uses no Apple Developer account and is not notarized. If the

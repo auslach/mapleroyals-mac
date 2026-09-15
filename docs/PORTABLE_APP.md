@@ -18,7 +18,7 @@ Developer ID signing and notarization remain an optional future distribution cho
 
 ## Rosetta and supported systems
 
-The launcher is compiled for arm64 and macOS 14. It accepts macOS 14–27; only macOS 26.5.2 on the original M1 Pro has been exercised. It checks Intel execution with the macOS-provided `arch` tool. When this fails, it opens a tiny Intel-only app built from our own `RosettaCheck.swift`, so Launch Services can offer Apple's Rosetta installer. It does not bundle Apple binaries or automatically accept Apple's terms.
+The launcher is compiled for arm64 and macOS 14. It accepts macOS 14–27; the original M1 Pro has been exercised on macOS 26.5.2 and, after a launch-order fix, macOS 27.0. See [the macOS 27 results](MACOS_27.md). It checks Intel execution with the macOS-provided `arch` tool. When this fails, it opens a tiny Intel-only app built from our own `RosettaCheck.swift`, so Launch Services can offer Apple's Rosetta installer. It does not bundle Apple binaries or automatically accept Apple's terms.
 
 Rosetta was already installed on the test Mac. The missing-Rosetta prompt path has not been exercised on a clean machine. Apple says opening an Intel app offers installation when needed, and currently describes general Rosetta availability through macOS 27. Do not assume that this Wine engine qualifies for macOS 28's limited legacy-game exception. [Apple's current Rosetta information](https://support.apple.com/en-us/102527)
 

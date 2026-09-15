@@ -100,11 +100,11 @@ def main():
         "overrides": "mscoree,mshtml=",
         "setup": [["wineboot", "-u"], [str(installer), "/DIR=C:\\MapleRoyals", "/NOICONS"],
                   ["reg", "import", "${ROOT}/settings.reg"]],
-        "arguments": ["C:\\MapleRoyals\\MapleRoyals.exe"],
+        "arguments": ["explorer", "/desktop=MapleRoyals,1024x768", "C:\\MapleRoyals\\MapleRoyals.exe"],
     }
     if args.performance:
         config["msync"] = True
-        config["debug"] = "-all"
+        config["debug"] = "-all,err+all"
         config["setup"].append(["reg", "add", "HKCU\\Software\\Wine\\Direct3D",
                                 "/v", "csmt", "/t", "REG_DWORD", "/d", "0", "/f"])
     (resources / "configuration.json").write_text(json.dumps(config, indent=2))

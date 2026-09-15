@@ -201,7 +201,7 @@ final class PortableInstallation {
         values["WINESERVER"] = engine.appendingPathComponent("bin/wineserver").path
         values["DYLD_FALLBACK_LIBRARY_PATH"] = libraries.path + ":/usr/lib"
         values["WINEDLLOVERRIDES"] = "mscoree,mshtml="
-        values["WINEDEBUG"] = "-all"
+        values["WINEDEBUG"] = "-all,err+all"
         values["WINEESYNC"] = "0"
         values["WINEMSYNC"] = "1"
         values["PATH"] = engine.appendingPathComponent("bin").path + ":/usr/bin:/bin:/usr/sbin:/sbin"
@@ -250,7 +250,9 @@ final class PortableInstallation {
         guard ready else { throw SetupError(message: "Complete the game installation first.") }
         report("Opening MapleRoyals…", nil)
         note("Launch environment: \(environment())")
-        try wine(["C:\\MapleRoyals\\MapleRoyals.exe"])
+        // Let Explorer finish initializing the window driver before it starts the game.
+        // Direct game launch can time out waiting for Explorer after a macOS upgrade.
+        try wine(["explorer", "/desktop=MapleRoyals,1024x768", "C:\\MapleRoyals\\MapleRoyals.exe"])
         // Keep ownership of the prefix until all game child processes have closed.
         try waitForWine()
     }

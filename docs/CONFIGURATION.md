@@ -17,7 +17,7 @@ For normal installation, use the [player guide](PLAYER_GUIDE.md). For building o
 | Working directory | `DATA/prefix/drive_c/MapleRoyals` after installation |
 | `WINEDLLOVERRIDES` | `mscoree,mshtml=`; disables Wine Mono/HTML components |
 | `WINEMSYNC` / `WINEESYNC` | `1` / `0` with `--performance` |
-| `WINEDEBUG` | `-all` with `--performance`; launcher still records setup and process results |
+| `WINEDEBUG` | `-all,err+all` with `--performance`; Wine errors and process results remain in the log |
 | Direct3D registry | `renderer=gl`; `csmt` DWORD `0` with `--performance` |
 | Wine desktop | `Explorer\Desktop=Default`; `Explorer\Desktops\Default=1024x768` |
 | Initial game window flag | `HKCU\Software\MapleRoyals\soFullScreen=0` |
@@ -25,11 +25,13 @@ For normal installation, use the [player guide](PLAYER_GUIDE.md). For building o
 | Render path | Game `Gr2D_DX8.dll` → builtin D3D8 → WineD3D → OpenGL |
 | Graphics replacements | None; D9VK/DXVK/D3DMetal not activated |
 
-The native launcher supplies the environment and executes this argument directly:
+The native launcher supplies the environment and starts Wine Explorer first. Explorer initializes the desktop/window driver before it starts the game:
 
 ```text
-wine C:\MapleRoyals\MapleRoyals.exe
+wine explorer /desktop=MapleRoyals,1024x768 C:\MapleRoyals\MapleRoyals.exe
 ```
+
+This avoids the startup ordering failure observed after upgrading to macOS 27. The Wine desktop size is separate from the game resolution and does not change the Mac display. See [the macOS 27 investigation](MACOS_27.md).
 
 The app's generated `Contents/Resources/configuration.json` records the actual paths. Wine state and game assets remain outside the app in the permanent data folder. The app reuses that data; copying the app to another Mac does not transfer or recreate it.
 
