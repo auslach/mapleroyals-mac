@@ -17,21 +17,14 @@ with tempfile.TemporaryDirectory(prefix='mapleroyals-display-build-', dir=output
     (app / 'Contents/MacOS').mkdir(parents=True)
     (app / 'Contents/Resources').mkdir()
     swift = (source / 'FullscreenDisplay.swift').read_text()
-    if a.refresh_hz == 120:
-        swift = swift.replace('refreshRate: 60)', 'refreshRate: 120)')
-        swift = swift.replace('A temporary 4:3 display can scale the game', 'A temporary 4:3 display at 120 Hz can scale the game')
-        swift = swift.replace('Test 1024×768 display', 'Test 1024×768 at 120 Hz')
-        swift = swift.replace('MapleRoyals Display Test', 'MapleRoyals 120 Hz Display Test')
-        swift = swift.replace('descriptor.name = "MapleRoyals 4:3"', 'descriptor.name = "MapleRoyals 4:3 120 Hz"')
-        swift = swift.replace('fullscreen-display.log', 'fullscreen-display-120.log')
     swift_path = temp / 'FullscreenDisplay.swift'
     swift_path.write_text(swift)
     subprocess.run(['xcrun', 'swiftc', '-O', '-target', 'arm64-apple-macos14.0', '-module-cache-path', str(temp / 'module-cache'),
         '-import-objc-header', str(source / 'CGVirtualDisplayPrivate.h'),
         str(swift_path), '-o', str(app / 'Contents/MacOS/MapleRoyalsDisplay')], check=True)
     info = dict(CFBundleExecutable='MapleRoyalsDisplay', CFBundleIdentifier='local.mapleroyals.displaytest',
-        CFBundleName='MapleRoyals Display Test', CFBundleVersion='0.1', CFBundlePackageType='APPL',
-        LSMinimumSystemVersion='14.0', NSHighResolutionCapable=True)
+        CFBundleName='MapleRoyals Display Test', CFBundleVersion='0.2', CFBundleShortVersionString='0.2', CFBundlePackageType='APPL',
+        LSMinimumSystemVersion='14.0', NSHighResolutionCapable=True, MapleRoyalsRefreshRate=a.refresh_hz)
     if a.refresh_hz == 120:
         info.update(CFBundleIdentifier='local.mapleroyals.display120', CFBundleName='MapleRoyals 120 Hz Display Test')
     (app / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))

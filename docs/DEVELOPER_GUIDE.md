@@ -131,7 +131,7 @@ For a compatible 120 Hz ProMotion panel, use this instead:
 python3 display/build.py --output "$HOME/Applications/MapleRoyals Display.app" --refresh-hz 120
 ```
 
-The helper creates a non-HiDPI 1024×768 virtual display and mirrors it to the built-in screen. It changes the whole desktop while active, and restores on its normal exit or Restore action. The launcher does not start or stop it automatically. The 20-second rollback applies only until the user chooses Keep.
+The helper offers non-HiDPI 800×600 and 1024×768 modes (default 1024×768) and mirrors the selected size to the built-in screen. The selector is disabled while a virtual display exists. Both refresh-rate builds use the same Swift source; `MapleRoyalsRefreshRate` in Info.plist supplies 60 or 120 Hz. It changes the whole desktop while active, and restores on its normal exit or Restore action. The launcher does not start or stop it automatically. The 20-second rollback applies only until the user chooses Keep.
 
 Fullscreen scaling of only the game while macOS stays at its normal resolution is **not implemented**. A future window-capture/presentation approach needs independent latency, input-coordinate and focus testing; it is not a proven performance fix. See [display implementation notes](../display/README.md) and the included DeskPad MIT notices for the current private CoreGraphics API dependency.
 

@@ -57,3 +57,7 @@ The original ZIP above remains the historical gameplay-test artifact. Gameplay e
 ## September 15: launcher 0.6.1 on macOS 27
 
 The current tracked download is version 0.6.1, with an explicit Explorer-first launch to address the no-window startup failure after the OS upgrade. The earlier checks above describe the historical ZIP and macOS 26.5.2 test; their checksums are not those of the current download. See [the macOS 27 diagnosis and validation limits](MACOS_27.md). The current ZIP SHA-256 is in [download/MapleRoyals-Mac.zip.sha256](../download/MapleRoyals-Mac.zip.sha256).
+
+## September 17: display helpers 0.2
+
+The current ZIP retains launcher 0.6.1 and updates both optional fullscreen helpers to 0.2. Each offers 800×600 and 1024×768, with 1024×768 selected by default. Both builds compiled and were inspected through computer use; both menus contained the two sizes, and selecting 800×600 in the 60 Hz helper updated its Test button. All four app signatures passed after ZIP extraction, and the game launcher executable matches the previous ZIP. The user activated and kept 800×600 at 120 Hz on macOS 27; the helper reported this active size and its log recorded successful creation, mirroring and restoration (status 0). Actual fullscreen appearance and game performance were not separately confirmed. The other size/rate combinations in version 0.2 remain untested live. Historical display tests above used the earlier 1024×768-only helper.

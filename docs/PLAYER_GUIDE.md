@@ -78,10 +78,14 @@ The **display helper** is a separate small Mac app included in the ZIP. It tempo
 
 1. **Close the game first.** Get the game working in a normal window before trying this.
 2. Open the ZIP's **Optional fullscreen** folder, then open **MapleRoyals Display 60 Hz.app**. Start with this version if you are unsure. **MapleRoyals Display 120 Hz.app** is intended for a compatible 120 Hz ProMotion MacBook Pro, such as the tested M1 Pro. **Run only one display helper at a time.**
-3. Click **Test 1024×768 display**. The Mac screen will change.
+3. In **Resolution**, choose **800×600** or **1024×768**. Start with **800×600** if you play at that resolution; **1024×768** remains the default. Click the **Test** button below the menu. The Mac screen will change.
 4. If the picture looks right, click **Keep this display** within **20 seconds**. If you do nothing, the helper restores the previous display automatically.
 5. Leave the helper open and open **MapleRoyals.app**. Inside the game, press **Option + Return** if needed to toggle its fullscreen mode.
-6. You can still set the **game** to **800×600** for smoother performance. The helper's 1024×768 setting and the game's resolution are separate. A 120 Hz helper does not mean the game runs at 120 frames per second.
+6. Set the **game** resolution separately. For the 800×600 display choice, also select **800×600** in the game; a larger game window may not fit that desktop. The helper does not change your game options. A 120 Hz helper does not mean the game runs at 120 frames per second.
+
+To switch resolutions, close the game and click **Restore normal display** first. The Resolution menu becomes available again; choose the other size, then Test and Keep before reopening the game. Both sizes use the same 4:3 shape with side bars. An 800×600 display mode is not yet a confirmed game-performance improvement.
+
+If your helper has no Resolution menu, download and unpack the current app ZIP, quit your old display helper, and replace both apps in **Optional fullscreen**. The updated helpers are version **0.2**. You do not need to reinstall the game.
 
 ### Return your Mac to its normal display
 
@@ -90,7 +94,7 @@ The **display helper** is a separate small Mac app included in the ZIP. It tempo
 
 Closing the game alone does **not** stop the helper. If your desktop still has side bars afterward, return to the helper and restore it. You can reopen and use the same helper on your next session. If macOS blocks a helper's first launch, use the first-open instructions below for that app too.
 
-The helper was tested on the M1 Pro's built-in display on macOS 26.5.2; it has not been revalidated on macOS 27. Other displays, sleep/wake and unexpected crashes have not been fully tested. It does not fix the slower 1024×768 game performance.
+The original 1024×768 helper was tested on the M1 Pro's built-in display on macOS 26.5.2. The new 800×600/120 Hz mode was accepted, kept and restored on macOS 27, but its fullscreen appearance and game performance have not been separately confirmed. Other displays, sleep/wake and unexpected crashes have not been fully tested. It does not fix the slower 1024×768 game performance.
 
 ## If macOS blocks the first open
 

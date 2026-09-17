@@ -21,7 +21,7 @@ This repository is currently private. Sign in to GitHub with an account that has
 
 ## Fullscreen
 
-The app ZIP includes an **Optional fullscreen** folder containing separate 60 Hz and 120 Hz display apps. [Follow the fullscreen steps in the player guide](docs/PLAYER_GUIDE.md#fullscreen-with-black-side-bars): close the game, open one helper, choose **Test 1024×768 display**, then **Keep this display**; launch the game and leave the helper open. After playing, close the game and choose **Restore normal display**, or quit the helper.
+The app ZIP includes an **Optional fullscreen** folder containing separate 60 Hz and 120 Hz display apps. [Follow the fullscreen steps in the player guide](docs/PLAYER_GUIDE.md#fullscreen-with-black-side-bars): close the game, open one helper, choose **800×600** or **1024×768** in its **Resolution** menu, press **Test**, then **Keep this display**; launch the game and leave the helper open. After playing, close the game and choose **Restore normal display**, or quit the helper.
 
 **This currently scales the whole Mac desktop while the helper is active.** It does not scale just the game. Fullscreen that leaves the desktop at its normal resolution has not been implemented.
 

@@ -63,7 +63,7 @@ def main():
             run('codesign', *signing, target)
             run('codesign', '--verify', '--strict', target)
         (stage / 'BUILD-INFO.json').write_text(json.dumps({
-            'version': '0.6.1', 'architecture': 'arm64', 'minimum_macos': '14.0',
+            'version': '0.6.1', 'display_helper_version': '0.2', 'architecture': 'arm64', 'minimum_macos': '14.0',
             'signature': 'Developer ID' if args.identity else 'ad-hoc',
             'notarized': False, 'contains_game_or_wine_binaries': False,
             'recipient_needs_python_or_command_line_tools': False,

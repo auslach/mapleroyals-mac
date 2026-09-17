@@ -44,16 +44,23 @@ The Optional fullscreen folder contains separate, ready-built display apps.
 1. Close the game first.
 2. Open MapleRoyals Display 60 Hz.app. The 120 Hz app is for a compatible
    ProMotion MacBook Pro. Run only one display app at a time.
-3. Click Test 1024x768 display, then Keep this display within 20 seconds.
+3. Choose 800x600 or 1024x768 in the Resolution menu, click Test,
+   then Keep this display within 20 seconds.
    If you do nothing, your display returns to normal automatically.
 4. Leave the display app open, launch MapleRoyals, and use Option+Return inside
-   the game if needed. The game can still use 800x600 for better performance.
+   the game if needed. Select the game resolution separately: use 800x600
+   in the game with the 800x600 display so its window fits.
 5. After playing, close the game, then click Restore normal display in the
    display app, or quit that display app with Command+Q.
 
+To change sizes, close the game and Restore normal display first, then choose
+the other resolution and Test/Keep again. Both helpers are version 0.2; if your
+old helper has no Resolution menu, replace it with the one in this ZIP.
+
 This scales the WHOLE Mac screen while active, including other apps. Closing the
 game alone does not restore your screen. It does not fix 1024x768 game lag.
-The optional fullscreen helpers have not been revalidated on macOS 27.
+The 800x600/120 Hz mode was accepted and restored on macOS 27. Its picture
+and gameplay performance have not been separately confirmed.
 
 IF MACOS BLOCKS FIRST OPEN
 This hobby app uses no Apple Developer account and is not notarized. If the
