@@ -6,7 +6,7 @@ Download the app from this repository and follow the steps below. You do **not**
 
 ## What you need
 
-- An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0; another Mac may need troubleshooting. Use the current launcher 0.7.0, which includes the macOS 27 startup fix and fullscreen controls.
+- An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0; another Mac may need troubleshooting. Use the current launcher 0.7.1, which includes the macOS 27 startup fix and fullscreen controls.
 - An internet connection and about 10 GB of free space before setup. This is a practical allowance, not a measured minimum.
 - Your own MapleRoyals account and the official **Windows WZ installer**.
 - [MapleRoyals-Mac.zip](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip), available directly from this repository.
@@ -41,29 +41,29 @@ If the launcher says Rosetta is needed, click **Enable Rosetta**. Complete Apple
 ## 3. Install the game once
 
 1. Click **Choose game installer…** and select the official WZ `.exe` you downloaded.
-2. Click **Install & Play**. The app downloads about 260 MB of support files and prepares the game environment. Leave the app open; this can take several minutes.
+2. Click **Install game**. The app downloads about 260 MB of support files and prepares the game environment. Leave the app open; this can take several minutes.
 3. When the Windows installer appears, follow its prompts and review any terms yourself. Keep the destination as **`C:\MapleRoyals`**. This is a folder managed by the app, not a new disk on your Mac.
 4. Complete any included **Visual C++** installation prompts.
-5. At the end, turn **off** the installer's **Launch MapleRoyals** checkbox if it is offered, then click **Finish**. Our launcher applies the settings and starts the game.
-6. Sign in inside the game. Choose **800×600** in the game options for the smoother tested result.
+5. At the end, turn **off** the installer's **Launch MapleRoyals** checkbox if it is offered, then click **Finish**. Our launcher applies the game settings and returns to Ready. It does not start the game.
+6. Click **Play** when you are ready, then sign in inside the game. Choose **800×600** in the game options for the smoother tested result.
 
 If macOS asks for access to Downloads so the app can read the installer you selected, allow that access if it matches what you are doing. Keep passwords and your PIC inside the game; never send them in chat, logs, or GitHub issues.
 
 ## Updating an existing installation
 
-If the app stopped showing a game window after a macOS 27 upgrade, get the current ZIP from [the same download link](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip). It contains launcher **0.7.0**, which includes the startup fix and fullscreen controls.
+If the app stopped showing a game window after a macOS 27 upgrade, get the current ZIP from [the same download link](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip). It contains launcher **0.7.1**, which includes the startup fix and fullscreen controls.
 
 1. Close the game normally and quit the old launcher. If you used an old fullscreen helper, restore your display and quit that helper too.
 2. Unpack the new ZIP. Replace the old **MapleRoyals.app** with the new one, wherever you keep it.
-3. Open the new app. It finds the game already installed in your Mac account. Choose your display option and click **Play**. You do not need the installer again. Game startup after the macOS upgrade has sometimes taken about 90 seconds; leave the launcher open while it starts.
+3. Open the new app. It finds the game already installed in your Mac account. For fullscreen, choose a size and click **Change screen resolution**, then **Play**. To keep your normal Mac desktop, just click **Play**. You do not need the installer again. Game startup after the macOS upgrade has sometimes taken about 90 seconds; leave the launcher open while it starts.
 
 Keep `~/Library/Application Support/MapleRoyalsLauncher` in place. Replacing the app does not replace or delete your game data. This update fixes startup; it does not claim to improve 1024×768 performance.
 
 ## Playing next time
 
-On the first opening of version 0.7.0, choose a **Display** option and click **Play**. Start with **Normal Mac display** if you want to keep the Mac desktop unchanged.
+Every opening shows the launcher with **800×600 selected**. Opening it does not change your screen resolution or load the game. There is no automatic-launch option.
 
-Leave **Start automatically next time** checked to have later double-click launches reuse your saved choice. Turn it off if you prefer to see the options before each session. When the launcher is already open after a game session, change the options if needed and click **Play**.
+For fullscreen: click **Change screen resolution**, confirm **Keep resolution** if asked, then click **Play**. For the normal Mac desktop: skip the resolution button and click **Play**. Choosing an item in the Display menu alone does not apply it. Play starts the game using the current screen settings.
 
 Keep the launcher open while playing. Close the game normally before quitting the launcher. The app waits for its game processes to finish, then restores any fullscreen display it created. This preview supports one game client at a time.
 
@@ -75,14 +75,14 @@ Fullscreen is part of **MapleRoyals.app**. You do not need to open a separate re
 
 **While fullscreen scaling is active, the whole Mac desktop is scaled too—even when you switch to another app.** The app restores the desktop when the game closes. Scaling only the game while keeping the desktop unchanged is not implemented.
 
-1. Close the game if it is already running. In the launcher, choose **Fullscreen scaling — 800×600** or **Fullscreen scaling — 1024×768** from **Display**.
+1. Open **MapleRoyals.app**. The **Display** menu defaults to **Fullscreen scaling — 800×600**. Select **1024×768** if you prefer. Selecting a size alone does not change the screen.
 2. Choose **60 Hz**, or **120 Hz** for a compatible ProMotion MacBook Pro such as the tested M1 Pro.
-3. Click **Play**. The app prepares the display before starting the game.
-4. The first time you use that size/rate on this display and macOS version, click **Keep & Play** within **20 seconds** if the picture looks right. If you do nothing or click **Cancel test**, your normal display returns and the game does not start. Previously confirmed modes start the game without repeating this test.
-5. Set the game's resolution separately to match the selected display size. Use **800×600** in the game with the 800×600 display so the picture fits. Press **Option + Return** inside the game if it still shows window borders.
+3. Click **Change screen resolution**. This applies the display mode without starting the game.
+4. The first time you use that size/rate on this display and macOS version, click **Keep resolution** within **20 seconds** if the picture looks right. If you do nothing or click **Cancel test**, your normal display returns. Confirmed modes do not repeat this test. Keeping the resolution still does not launch the game.
+5. Click **Play** to start the game. Set the game's resolution separately to match the selected display size. Use **800×600** in the game with the 800×600 display. Press **Option + Return** inside the game if it still shows window borders.
 6. Close the game normally when finished. The launcher restores the normal Mac display automatically after the game processes exit.
 
-The **Restore normal display** button is available while fullscreen scaling is active if you need to restore it sooner. To change size or refresh rate, close the game first, change the launcher options, and click Play again. Keep the launcher open while the game is running.
+The **Restore normal display** button is available after applying a resolution, before or during gameplay. Quitting an idle launcher also restores its display. To change size or refresh rate, close the game first, choose the new settings and click **Change screen resolution**, then **Play**. Keep the launcher open while the game is running. Each fresh opening selects 800×600 again; the refresh rate and confirmed modes are remembered.
 
 An 800×600 display mode is not a confirmed graphics-performance improvement; the game itself was smoother at 800×600. A 120 Hz display does not mean the game renders at 120 frames per second. Other displays, forced app termination, sleep/wake and unexpected crashes have not been fully tested.
 
@@ -105,7 +105,7 @@ Do not disable system security or override a malware/damaged-app warning. Work o
 | Download link shows 404 / Not Found | This repository is private. Sign in to GitHub with an account that has access. |
 | Source files but no app | Open **download → MapleRoyals-Mac.zip** in the repository folder and unpack that ZIP. You do not need to run `setup.py`. |
 | Setup stopped partway through | Close the game and installer, quit the launcher, then reopen it and choose the official installer again if asked. Keep the installer until setup finishes. If the problem repeats, use **Show log** and contact the maintainer. |
-| No game window after upgrading to macOS 27 | Follow **Updating an existing installation** above. Use launcher 0.7.0; do not delete or reinstall your game data. |
+| No game window after upgrading to macOS 27 | Follow **Updating an existing installation** above. Use launcher 0.7.1; do not delete or reinstall your game data. |
 | The game fails when selecting a character | One initial failure occurred during testing, followed by a successful retry. Its cause is unknown. If it repeats, report whether the entire game closed or it returned to login. |
 | 1024×768 feels laggy | Use **800×600**. Fullscreen scaling does not fix this rendering-performance difference. |
 | The game stays small in the top-left corner | Follow the fullscreen steps above. The game's fullscreen toggle alone did not scale correctly on the tested Mac. |

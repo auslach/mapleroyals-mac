@@ -65,3 +65,7 @@ The current ZIP retains launcher 0.6.1 and updates both optional fullscreen help
 ## September 18: combined app 0.7.0
 
 The current ZIP integrates the fullscreen controls into MapleRoyals.app and no longer packages separate display apps. It reuses the installed game and the macOS 27 startup fix. The earlier version/checksum records are historical. See [the combined app behavior and validation](INTEGRATED_APP.md) and the adjacent download checksum for the current artifact.
+
+## September 18: explicit launcher controls 0.7.1
+
+Version 0.7.1 replaces automatic startup with independent Change screen resolution and Play buttons. It always opens idle with 800×600 selected and ignores old auto-launch settings. First-time setup finishes at Ready. See [current behavior and validation](INTEGRATED_APP.md) and the adjacent download checksum.

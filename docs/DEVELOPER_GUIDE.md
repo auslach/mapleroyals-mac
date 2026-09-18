@@ -44,7 +44,7 @@ The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatib
 
 **The ready-to-run player download is tracked at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip).** A clone and GitHub's Code → Download ZIP both include this app archive. The README also links directly to its download. Players do not build the app.
 
-The builder writes new builds to ignored `dist/` outputs; it does not automatically replace the tracked download or publish a GitHub release. To update the player download, build into a new output directory, validate the package and gameplay, then replace the single tracked ZIP, update its adjacent SHA-256 file and [acceptance record](ZIP_ACCEPTANCE.md), and commit them with any changed setup instructions. The current tracked package contains the previously tested app bundles unchanged, with updated documentation outside the bundles; its acceptance record distinguishes those two artifacts.
+The builder writes new builds to ignored `dist/` outputs; it does not automatically replace the tracked download or publish a GitHub release. To update the player download, build into a new output directory, validate the package and gameplay, then replace the single tracked ZIP, update its adjacent SHA-256 file and [acceptance record](ZIP_ACCEPTANCE.md), and commit them with any changed setup instructions. The current tracked package contains the combined launcher; its acceptance record distinguishes versions and validation scope.
 
 The default build uses ad-hoc signatures and no Apple Developer account, Team Identifier or notarization credentials. `--identity` exists for a future explicitly chosen Developer ID build; it never selects an identity automatically or notarizes/uploads anything. The current hobby workflow deliberately does not require a business Apple identity. See [packaging and licensing notes](PACKAGING.md) before changing distribution strategy.
 
@@ -121,15 +121,15 @@ Known limits include one unexplained initial character-loading failure, poorer 1
 
 ## Integrated fullscreen lifecycle
 
-Version 0.7.0 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
+Version 0.7.1 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
 
-The launcher offers normal display or non-HiDPI 800×600/1024×768 scaling, with 60/120 Hz. First launch after upgrade presents options. `play-preferences.json` stores the selection, automatic-launch preference, and previously confirmed display/mode combinations. Confirmation keys include the physical display UUID and macOS major version; never distribute this user file.
+The launcher offers normal display or non-HiDPI 800×600/1024×768 scaling, with 60/120 Hz. Every opening selects 800×600 without applying it or starting Wine. `play-preferences.json` stores only the refresh rate and previously confirmed display/mode combinations. Legacy selection/auto-launch fields are ignored when decoding. Confirmation keys include the physical display UUID and macOS major version; never distribute this user file.
 
-1. Install/setup, when needed, completes before scaling the display.
-2. Before game startup, create the virtual display and mirror it to the built-in screen. A delayed callback uses a generation token so cancellation cannot affect a subsequent session.
-3. A new display/mode combination gets a 20-second Keep & Play / Cancel test. Timeout/cancel restores the physical mode and does not start Wine. Accepted modes are remembered. Restoring early during gameplay is also available.
-4. Start the unchanged Explorer-first CX24 game command. After `play()` finishes waiting for Wine children, restore the display on the AppKit thread. The same cleanup runs on startup errors; normal launcher termination releases any owned virtual display.
-5. Quitting during a display preview cancels it. Quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
+1. Startup checks installation readiness and Rosetta, then waits. Install game prepares the installation and returns to Ready without launching the game.
+2. Only Change screen resolution creates the virtual display and mirrors it to the built-in screen. Selecting a menu item only changes the pending choice. A delayed callback uses a generation token so cancellation cannot affect a subsequent session.
+3. A new display/mode combination gets a 20-second Keep resolution / Cancel test. Timeout/cancel restores the physical mode. Acceptance returns to idle without starting Wine. Accepted modes are remembered.
+4. Only Play starts the unchanged Explorer-first CX24 game command, using whichever display is currently active. After `play()` finishes waiting for Wine children, restore the display on the AppKit thread. The same cleanup runs on startup errors; normal launcher termination releases any owned virtual display.
+5. Restore normal display is available before or during gameplay. Quitting during a display preview cancels it; quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
 
 Fullscreen scaling still changes the whole desktop. Game resolution and Option+Return remain game settings. Forced termination, sleep/wake, multiple monitors and newer macOS private-API changes are not guaranteed to recover correctly. No graphics-performance fix is claimed. See [the integrated app validation](INTEGRATED_APP.md).
 

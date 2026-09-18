@@ -2,10 +2,7 @@ import AppKit
 import CoreGraphics
 
 struct PlayPreferences: Codable {
-    var display = PlayDisplay.normal
     var refreshRate = 60
-    var automaticLaunch = true
-    var hasLaunched = false
     var confirmedDisplays: Set<String> = []
 }
 

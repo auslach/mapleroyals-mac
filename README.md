@@ -21,15 +21,19 @@ This repository is currently private. Sign in to GitHub with an account that has
 
 ## Fullscreen
 
-Fullscreen controls are now inside **MapleRoyals.app** (version **0.7.0**). Choose **Normal Mac display**, **Fullscreen scaling — 800×600**, or **Fullscreen scaling — 1024×768**, select **60 Hz** or **120 Hz**, and click **Play**. The first test of a display mode asks you to choose **Keep & Play** within 20 seconds; otherwise it restores your display without starting the game.
+Fullscreen controls are inside **MapleRoyals.app** (version **0.7.1**). The usual flow is:
 
-The app remembers your choice and restores the normal display when the game closes. Leave **Start automatically next time** checked for later double-click launches. [Player instructions](docs/PLAYER_GUIDE.md#fullscreen-with-black-side-bars)
+1. Open the app. **800×600** is selected; the display and game stay unchanged.
+2. Click **Change screen resolution** to apply it. You can select **1024×768** instead, and choose **60 Hz** or **120 Hz**. A new mode asks you to **Keep resolution** within 20 seconds.
+3. Click **Play** to start the game.
+
+Opening the launcher never starts the game or applies a resolution, even after upgrading from a version with auto-launch enabled. Play uses the current display; you can skip the resolution button to keep the normal Mac desktop. The app restores any display it created when the game closes. [Player instructions](docs/PLAYER_GUIDE.md#fullscreen-with-black-side-bars)
 
 **Fullscreen scaling still changes the whole Mac desktop while playing.** It does not scale just the game. No separate display app is needed. Close and quit any old display helper before using the combined app.
 
 ## Updating after a macOS upgrade
 
-If no game window appears after upgrading to macOS 27, download the current ZIP (launcher **0.7.0**) above. Close the old game and launcher, unpack the new ZIP, and replace your old **MapleRoyals.app**. Open the new app; it reuses your installed game. **Do not delete the game data folder or reinstall the game.** The launcher now initializes Wine's desktop before starting MapleRoyals. [Investigation and validation](docs/MACOS_27.md)
+If no game window appears after upgrading to macOS 27, download the current ZIP (launcher **0.7.1**) above. Close the old game and launcher, unpack the new ZIP, and replace your old **MapleRoyals.app**. Open the new app and click **Play** when ready; it reuses your installed game. **Do not delete the game data folder or reinstall the game.** The launcher now initializes Wine's desktop before starting MapleRoyals. [Investigation and validation](docs/MACOS_27.md)
 
 ## Tested status
 
