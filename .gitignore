@@ -40,6 +40,7 @@ user.reg
 userdef.reg
 system.reg
 .launcher-setup-*
+play-preferences.json
 provisioned-assets.json
 .env
 .env.*

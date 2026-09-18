@@ -20,8 +20,8 @@ def bundle(path, executable, identifier, name, **extra):
     (path / 'Contents/MacOS').mkdir(parents=True)
     (path / 'Contents/Resources').mkdir()
     info = dict(CFBundleExecutable=executable, CFBundleIdentifier=identifier,
-                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.6.1',
-                CFBundleShortVersionString='0.6.1', LSMinimumSystemVersion='14.0',
+                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.7.0',
+                CFBundleShortVersionString='0.7.0', LSMinimumSystemVersion='14.0',
                 NSHighResolutionCapable=True, **extra)
     (path / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
 
@@ -44,7 +44,8 @@ def main():
         bundle(app, 'MapleRoyals', 'local.mapleroyals.portable', 'MapleRoyals')
         cache = temporary / 'module-cache'
         run('xcrun', 'swiftc', '-swift-version', '5', '-O', '-target', 'arm64-apple-macos14.0',
-            '-module-cache-path', cache, SOURCE / 'PortableCore.swift', SOURCE / 'PortableLauncher.swift',
+            '-module-cache-path', cache, '-import-objc-header', REPO / 'display/CGVirtualDisplayPrivate.h',
+            SOURCE / 'PortableCore.swift', SOURCE / 'GameDisplay.swift', SOURCE / 'PortableLauncher.swift',
             '-o', app / 'Contents/MacOS/MapleRoyals')
         helper = app / 'Contents/Helpers/Intel Compatibility.app'
         bundle(helper, 'IntelCompatibility', 'local.mapleroyals.intel-compatibility', 'Intel Compatibility', LSUIElement=True)
@@ -52,18 +53,17 @@ def main():
             SOURCE / 'RosettaCheck.swift', '-o', helper / 'Contents/MacOS/IntelCompatibility')
         for filename in ['assets.json', 'settings.reg', 'THIRD_PARTY_NOTICES.md']:
             shutil.copy2(REPO / filename, app / 'Contents/Resources' / filename)
-        for hz in (60, 120):
-            display = stage / 'Optional fullscreen' / ('MapleRoyals Display %s Hz.app' % hz)
-            run('python3', REPO / 'display/build.py', '--output', display, '--refresh-hz', hz)
+        for filename in ['DeskPad-LICENSE.md', 'NOTICE.md']:
+            shutil.copy2(REPO / 'display' / filename, app / 'Contents/Resources' / filename)
         shutil.copy2(SOURCE / 'START-HERE.txt', stage / 'START-HERE.txt')
         signing = ['--force', '--sign', args.identity or '-']
         if args.identity:
             signing += ['--options', 'runtime', '--timestamp']
-        for target in [helper, app, *sorted((stage / 'Optional fullscreen').glob('*.app'))]:
+        for target in [helper, app]:
             run('codesign', *signing, target)
             run('codesign', '--verify', '--strict', target)
         (stage / 'BUILD-INFO.json').write_text(json.dumps({
-            'version': '0.6.1', 'display_helper_version': '0.2', 'architecture': 'arm64', 'minimum_macos': '14.0',
+            'version': '0.7.0', 'integrated_fullscreen': True, 'architecture': 'arm64', 'minimum_macos': '14.0',
             'signature': 'Developer ID' if args.identity else 'ad-hoc',
             'notarized': False, 'contains_game_or_wine_binaries': False,
             'recipient_needs_python_or_command_line_tools': False,

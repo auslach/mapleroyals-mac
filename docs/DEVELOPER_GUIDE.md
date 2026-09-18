@@ -40,7 +40,7 @@ The default outputs are `dist/MapleRoyals-preview/` and `dist/MapleRoyals-previe
 python3 portable/build.py --output dist/MapleRoyals-preview-next
 ```
 
-The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatibility helper, both compiled fullscreen display helpers, `START-HERE.txt`, configuration, notices and build information. The recipient downloads the official game separately; on first run the app downloads about 260 MB of pinned runtime archives and initializes its own Wine prefix.
+The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatibility helper, integrated fullscreen controls, `START-HERE.txt`, configuration, notices and build information. The recipient downloads the official game separately; on first run the app downloads about 260 MB of pinned runtime archives and initializes its own Wine prefix.
 
 **The ready-to-run player download is tracked at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip).** A clone and GitHub's Code → Download ZIP both include this app archive. The README also links directly to its download. Players do not build the app.
 
@@ -53,9 +53,10 @@ The default build uses ad-hoc signatures and no Apple Developer account, Team Id
 | File | Responsibility |
 |---|---|
 | [`portable/PortableLauncher.swift`](../portable/PortableLauncher.swift) | Native AppKit UI, installer selection, Rosetta flow, status and Play controls. |
+| [`portable/GameDisplay.swift`](../portable/GameDisplay.swift) | Saved play options, virtual display creation, mirroring, restoration and cancellation of pending display callbacks. |
 | [`portable/PortableCore.swift`](../portable/PortableCore.swift) | Verified downloads, staged runtime extraction, exclusive installation lock, prefix setup, process launch, install marker and logs. |
 | [`portable/RosettaCheck.swift`](../portable/RosettaCheck.swift) | Tiny Intel-only helper that can trigger Apple's Rosetta installation prompt. |
-| [`portable/build.py`](../portable/build.py) | Compile, sign and package the portable app and helpers. |
+| [`portable/build.py`](../portable/build.py) | Compile, sign and package the combined app and embedded Rosetta helper. |
 | [`portable/START-HERE.txt`](../portable/START-HERE.txt) | Short player instructions included in generated ZIPs. Keep these consistent with the player guide. |
 | [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip) | Tracked ready-built player download, with an adjacent SHA-256 checksum. |
 | [`assets.json`](../assets.json) | Pinned upstream runtime/template URLs, sizes and SHA-256 hashes. |
@@ -74,6 +75,7 @@ The portable launcher calculates paths from the current user's Application Suppo
   logs/launcher.log
   logs/previous-launch.log
   installation.json
+  play-preferences.json
 ```
 
 The portable app can move without relocating its data. It does not import the older `MapleRoyals-PoC` installation. On first run it verifies and provisions the runtime, runs the user's official installer, applies settings, and writes the installed marker only after success. Later launches start Wine Explorer, which initializes the window system before starting the installed game. The launcher stays open while the game runs and currently permits one client at a time. See [portable implementation details](PORTABLE_APP.md) for lifecycle and failure behavior.
@@ -117,23 +119,19 @@ Preserve a working installation before a runtime/prefix migration. Do not silent
 
 Known limits include one unexplained initial character-loading failure, poorer 1024×768 performance, and untested second-Mac/Rosetta/Gatekeeper flows. Missing-Rosetta, external displays, sleep/wake and long-session reliability need further testing. No production notarization is claimed.
 
-## Fullscreen helper development
+## Integrated fullscreen lifecycle
 
-The portable builder already includes both display apps. Their [player instructions](PLAYER_GUIDE.md#fullscreen-with-black-side-bars) cover normal use. To build just one helper, choose one of these commands and an unused output path:
+Version 0.7.0 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
 
-```sh
-python3 display/build.py --output "$HOME/Applications/MapleRoyals Display.app"
-```
+The launcher offers normal display or non-HiDPI 800×600/1024×768 scaling, with 60/120 Hz. First launch after upgrade presents options. `play-preferences.json` stores the selection, automatic-launch preference, and previously confirmed display/mode combinations. Confirmation keys include the physical display UUID and macOS major version; never distribute this user file.
 
-For a compatible 120 Hz ProMotion panel, use this instead:
+1. Install/setup, when needed, completes before scaling the display.
+2. Before game startup, create the virtual display and mirror it to the built-in screen. A delayed callback uses a generation token so cancellation cannot affect a subsequent session.
+3. A new display/mode combination gets a 20-second Keep & Play / Cancel test. Timeout/cancel restores the physical mode and does not start Wine. Accepted modes are remembered. Restoring early during gameplay is also available.
+4. Start the unchanged Explorer-first CX24 game command. After `play()` finishes waiting for Wine children, restore the display on the AppKit thread. The same cleanup runs on startup errors; normal launcher termination releases any owned virtual display.
+5. Quitting during a display preview cancels it. Quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
 
-```sh
-python3 display/build.py --output "$HOME/Applications/MapleRoyals Display.app" --refresh-hz 120
-```
-
-The helper offers non-HiDPI 800×600 and 1024×768 modes (default 1024×768) and mirrors the selected size to the built-in screen. The selector is disabled while a virtual display exists. Both refresh-rate builds use the same Swift source; `MapleRoyalsRefreshRate` in Info.plist supplies 60 or 120 Hz. It changes the whole desktop while active, and restores on its normal exit or Restore action. The launcher does not start or stop it automatically. The 20-second rollback applies only until the user chooses Keep.
-
-Fullscreen scaling of only the game while macOS stays at its normal resolution is **not implemented**. A future window-capture/presentation approach needs independent latency, input-coordinate and focus testing; it is not a proven performance fix. See [display implementation notes](../display/README.md) and the included DeskPad MIT notices for the current private CoreGraphics API dependency.
+Fullscreen scaling still changes the whole desktop. Game resolution and Option+Return remain game settings. Forced termination, sleep/wake, multiple monitors and newer macOS private-API changes are not guaranteed to recover correctly. No graphics-performance fix is claimed. See [the integrated app validation](INTEGRATED_APP.md).
 
 ## Older local source setup
 

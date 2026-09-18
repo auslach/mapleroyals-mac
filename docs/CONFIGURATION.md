@@ -60,6 +60,6 @@ The original working game was installed under Sikarugir Wine 10, cloned, and mig
 
 On the test Mac, the user confirmed game entry and movement and compared both resolutions repeatedly. PIC was not prompted. Map changes were subsequently confirmed in the fresh ZIP test. Two concurrent clients remain untested and are not exposed by the portable launcher. The final OpenGL app was user-confirmed playable at 800×600; 1024×768 remained laggy.
 
-## Optional display helper
+## Display scaling
 
-The 60/120 Hz helper changes macOS display presentation, not the game's internal resolution or frame rate. It is separate from the main launcher, changes the whole built-in display for the session and restores on normal helper exit. Its private API and crash/sleep/multiple-monitor behavior need further validation. See [the helper's source and notes](../display/README.md).
+The 60/120 Hz helper changes macOS display presentation, not the game's internal resolution or frame rate. The portable app integrates it into the launcher and restores the whole built-in display when the game session ends. The older source launcher still uses the separate development helper. Its private API and crash/sleep/multiple-monitor behavior need further validation. See [the helper's source and notes](../display/README.md).

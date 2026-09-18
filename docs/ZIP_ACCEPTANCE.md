@@ -61,3 +61,7 @@ The current tracked download is version 0.6.1, with an explicit Explorer-first l
 ## September 17: display helpers 0.2
 
 The current ZIP retains launcher 0.6.1 and updates both optional fullscreen helpers to 0.2. Each offers 800×600 and 1024×768, with 1024×768 selected by default. Both builds compiled and were inspected through computer use; both menus contained the two sizes, and selecting 800×600 in the 60 Hz helper updated its Test button. All four app signatures passed after ZIP extraction, and the game launcher executable matches the previous ZIP. The user activated and kept 800×600 at 120 Hz on macOS 27; the helper reported this active size and its log recorded successful creation, mirroring and restoration (status 0). Actual fullscreen appearance and game performance were not separately confirmed. The other size/rate combinations in version 0.2 remain untested live. Historical display tests above used the earlier 1024×768-only helper.
+
+## September 18: combined app 0.7.0
+
+The current ZIP integrates the fullscreen controls into MapleRoyals.app and no longer packages separate display apps. It reuses the installed game and the macOS 27 startup fix. The earlier version/checksum records are historical. See [the combined app behavior and validation](INTEGRATED_APP.md) and the adjacent download checksum for the current artifact.

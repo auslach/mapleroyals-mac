@@ -1,18 +1,18 @@
 # Portable app implementation and validation
 
-The repository includes a ready-built [app ZIP](../download/MapleRoyals-Mac.zip) containing `MapleRoyals.app`, an Intel compatibility helper inside it, two optional fullscreen apps, and `START-HERE.txt`. Recipients do not need Python, Command Line Tools, Xcode, Homebrew, Git, CrossOver, or the Sikarugir application. They still need an Apple silicon Mac, an internet connection, Rosetta when requested, their own account, and the official WZ installer.
+The repository includes a ready-built [app ZIP](../download/MapleRoyals-Mac.zip) containing `MapleRoyals.app`, an Intel compatibility helper inside it, integrated fullscreen controls, and `START-HERE.txt`. Recipients do not need Python, Command Line Tools, Xcode, Homebrew, Git, CrossOver, or the Sikarugir application. They still need an Apple silicon Mac, an internet connection, Rosetta when requested, their own account, and the official WZ installer.
 
 This is an experimental preview. A fresh direct-CX24 installation from the ZIP now reaches gameplay and map changes on the original M1 Pro, with one unexplained character-loading failure before a successful retry. A second Mac is not yet validated. Smooth 1024×768 remains unresolved.
 
 ## What the recipient does
 
-The [player guide](PLAYER_GUIDE.md) contains first-run setup, macOS approvals, everyday play and the complete fullscreen Test/Keep/Restore instructions. The [developer guide](DEVELOPER_GUIDE.md) covers building and sharing the compiled ZIP. The sections below describe implementation details and validation.
+The [player guide](PLAYER_GUIDE.md) contains first-run setup, macOS approvals, everyday play and the integrated fullscreen confirmation/restoration flow. The [developer guide](DEVELOPER_GUIDE.md) covers building and sharing the compiled ZIP. The sections below describe implementation details and validation.
 
 ## No Apple Developer account
 
 The default build uses an ad-hoc signature (`codesign --sign -`). It uses no Apple account, Developer ID certificate, team identity, or notarization credentials. The generated app reports `TeamIdentifier=not set`.
 
-The recipient may need **System Settings → Privacy & Security → Open Anyway** after first attempting to open this trusted app. Apple documents this per-app exception in [Safely open apps on your Mac](https://support.apple.com/en-us/102445). The optional apps and Intel helper can require separate approvals. Do not disable Gatekeeper, SIP or malware checks, and do not override a malware/damaged-app warning. Managed Macs may prohibit exceptions. A downloaded/quarantined copy on a second Mac has not been tested yet, so the exact number and wording of macOS prompts are unverified.
+The recipient may need **System Settings → Privacy & Security → Open Anyway** after first attempting to open this trusted app. Apple documents this per-app exception in [Safely open apps on your Mac](https://support.apple.com/en-us/102445). The embedded Intel helper may require its own approval. Do not disable Gatekeeper, SIP or malware checks, and do not override a malware/damaged-app warning. Managed Macs may prohibit exceptions. A downloaded/quarantined copy on a second Mac has not been tested yet, so the exact number and wording of macOS prompts are unverified.
 
 Developer ID signing and notarization remain an optional future distribution choice, not a prerequisite for this hobby build. Apple documents their role in [Developer ID guidance](https://developer.apple.com/developer-id/). No Apple account is used for this preview.
 
@@ -36,6 +36,7 @@ Mutable data lives outside the app, at a location computed from the current macO
   logs/launcher.log
   logs/previous-launch.log
   installation.json
+  play-preferences.json
 ```
 
 This is separate from the older source recipe's `MapleRoyals-PoC` directory. It does not import, change, or migrate that installation. The app itself can move without changing the data directory. No developer home directory or installer path is built into the distributable app.
@@ -44,7 +45,7 @@ The runtime is `WS12WineCX24.0.7_5` plus Template 1.0.15 native libraries. The e
 
 The main app uses only Apple's shipped frameworks and command-line executables (`arch`, `uname`, `tar`) plus the downloaded Wine runtime. Those system executables do not require installing developer tools. Compiling the ZIP is the maintainer's job.
 
-The launcher stays open while setup/game processes run. Close the game before quitting the launcher. Simultaneous clients are deliberately unavailable in this version. The optional fullscreen helpers are already compiled, but remain separate apps with the existing manual Test/Keep/Restore flow.
+The launcher stays open while setup/game processes run. Close the game before quitting the launcher. Simultaneous clients are deliberately unavailable in this version. Version 0.7.0 manages fullscreen scaling in the launcher: choose size/rate, confirm a new mode once, and restore automatically when the game session ends. The first opening shows the options; later launches can reuse the saved choice automatically. See [integration details and validation](INTEGRATED_APP.md).
 
 ## Build the ZIP (maintainer only)
 
@@ -66,4 +67,4 @@ Still unverified: a second Mac, absent-Rosetta setup, first-open prompts after i
 
 ## Contents and licensing
 
-The ZIP contains our compiled launcher and helpers, configuration, and notices. It includes no Wine binaries, game installers, EXE/WZ/IMG game assets, used prefixes, or personal logs. The optional helper includes the DeskPad MIT notices. Runtimes are downloaded from their maintainers on each recipient's Mac. See [third-party notices](../THIRD_PARTY_NOTICES.md) for component and redistribution scope.
+The ZIP contains our compiled launcher and helpers, configuration, and notices. It includes no Wine binaries, game installers, EXE/WZ/IMG game assets, used prefixes, or personal logs. The combined app includes the DeskPad MIT license and provenance notice for its display integration. Runtimes are downloaded from their maintainers on each recipient's Mac. See [third-party notices](../THIRD_PARTY_NOTICES.md) for component and redistribution scope.

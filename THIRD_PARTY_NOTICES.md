@@ -4,7 +4,7 @@ This repository contains the native launcher, local provisioning scripts, docume
 
 ## Included material
 
-The private CoreGraphics declarations in `display/CGVirtualDisplayPrivate.h` were taken from the MIT-licensed DeskPad project at inspected commit `c3349f0e237e000cb4826fb3ea1cdd1c44949461`. Keep [its full license](display/DeskPad-LICENSE.md) and [provenance notice](display/NOTICE.md) with this material. The display-helper build copies those notices into its generated app.
+The private CoreGraphics declarations in `display/CGVirtualDisplayPrivate.h` were taken from the MIT-licensed DeskPad project at inspected commit `c3349f0e237e000cb4826fb3ea1cdd1c44949461`. Keep [its full license](display/DeskPad-LICENSE.md) and [provenance notice](display/NOTICE.md) with this material. The combined launcher and standalone display-helper builds copy those notices into their generated apps.
 
 ## Downloaded on the user's Mac
 

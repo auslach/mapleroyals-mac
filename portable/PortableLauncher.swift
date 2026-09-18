@@ -10,6 +10,18 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     let choose = NSButton(title: "Choose game installer…", target: nil, action: nil)
     let download = NSButton(title: "Get the game installer", target: nil, action: nil)
     let progress = NSProgressIndicator()
+    let displayChoice = NSPopUpButton(frame: .zero, pullsDown: false)
+    let refreshChoice = NSPopUpButton(frame: .zero, pullsDown: false)
+    let automaticLaunch = NSButton(checkboxWithTitle: "Start automatically next time", target: nil, action: nil)
+    let restore = NSButton(title: "Restore normal display", target: nil, action: nil)
+    let displayNote = NSTextField(wrappingLabelWithString: "Fullscreen scales the whole Mac screen. Set the game to the matching resolution and use Option+Return if needed. Your normal display returns when the game closes.")
+    var preferences = PlayPreferences()
+    var gameDisplay: GameDisplay!
+    var preparingDisplay = false
+    var awaitingDisplayConfirmation = false
+    var confirmationTimer: Timer?
+    var pendingDisplayKey: String?
+    var preferencesURL: URL { installation.root.appendingPathComponent("play-preferences.json") }
     let worker = DispatchQueue(label: "local.mapleroyals.setup", qos: .userInitiated)
     var installation: PortableInstallation!
     var installer: URL?
@@ -27,7 +39,15 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
                 DispatchQueue.main.async { self?.updateProgress(text, fraction) }
             }
             try installation.open()
-            checkCompatibility(autoPlay: true)
+            gameDisplay = GameDisplay { [weak self] text in self?.installation?.note(text) }
+            if FileManager.default.fileExists(atPath: preferencesURL.path) {
+                preferences = try JSONDecoder().decode(PlayPreferences.self, from: Data(contentsOf: preferencesURL))
+                if ![60, 120].contains(preferences.refreshRate) { preferences.refreshRate = 60 }
+            }
+            displayChoice.selectItem(at: PlayDisplay.allCases.firstIndex(of: preferences.display) ?? 0)
+            refreshChoice.selectItem(at: preferences.refreshRate == 120 ? 1 : 0)
+            automaticLaunch.state = preferences.automaticLaunch ? .on : .off
+            checkCompatibility(autoPlay: preferences.hasLaunched && preferences.automaticLaunch)
         } catch {
             fatalStartupError = true
             showError(error)
@@ -40,7 +60,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         let submenu = NSMenu(); item.submenu = submenu
         submenu.addItem(withTitle: "Quit MapleRoyals", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         NSApp.mainMenu = menu
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 400),
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 500),
                           styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
         window.title = "MapleRoyals"
         window.isReleasedWhenClosed = false
@@ -59,7 +79,20 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         download.action = #selector(getInstaller)
         let logs = NSButton(title: "Show log", target: self, action: #selector(showLog))
         let files = NSButton(title: "Game files", target: self, action: #selector(showFiles))
-        let buttons = NSStackView(views: [primary, choose])
+        displayChoice.addItems(withTitles: PlayDisplay.allCases.map(\.title))
+        displayChoice.setAccessibilityLabel("Display")
+        refreshChoice.addItems(withTitles: ["60 Hz", "120 Hz"])
+        refreshChoice.setAccessibilityLabel("Refresh rate")
+        for control in [displayChoice, refreshChoice] {
+            control.target = self; control.action = #selector(changePlayOptions)
+        }
+        automaticLaunch.target = self; automaticLaunch.action = #selector(changePlayOptions)
+        restore.target = self; restore.action = #selector(restoreDisplayNow)
+        let displayOptions = NSStackView(views: [NSTextField(labelWithString: "Display:"), displayChoice, refreshChoice])
+        displayOptions.orientation = .horizontal; displayOptions.spacing = 8
+        displayNote.font = .systemFont(ofSize: 11)
+        displayNote.textColor = .secondaryLabelColor
+        let buttons = NSStackView(views: [primary, choose, restore])
         buttons.orientation = .horizontal
         buttons.spacing = 12
         let utilities = NSStackView(views: [download, logs, files])
@@ -69,10 +102,10 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         progress.minValue = 0; progress.maxValue = 1
         progress.isIndeterminate = true
         progress.isHidden = true
-        let stack = NSStackView(views: [heading, subtitle, message, selection, progress, buttons, utilities, note])
+        let stack = NSStackView(views: [heading, subtitle, message, displayOptions, automaticLaunch, displayNote, selection, progress, buttons, utilities, note])
         stack.orientation = .vertical
         stack.alignment = .leading
-        stack.spacing = 18
+        stack.spacing = 12
         stack.translatesAutoresizingMaskIntoConstraints = false
         window.contentView!.addSubview(stack)
         NSLayoutConstraint.activate([
@@ -82,7 +115,8 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
             message.widthAnchor.constraint(equalTo: stack.widthAnchor),
             selection.widthAnchor.constraint(equalTo: stack.widthAnchor),
             progress.widthAnchor.constraint(equalTo: stack.widthAnchor),
-            note.widthAnchor.constraint(equalTo: stack.widthAnchor)
+            note.widthAnchor.constraint(equalTo: stack.widthAnchor),
+            displayNote.widthAnchor.constraint(equalTo: stack.widthAnchor)
         ])
         primary.isEnabled = false
         choose.isEnabled = false
@@ -127,15 +161,48 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     func refreshControls() {
-        primary.title = needsRosetta ? "Enable Rosetta" : (installation?.ready == true ? "Play" : "Install & Play")
+        if awaitingDisplayConfirmation {
+            primary.title = "Keep & Play"
+            primary.isEnabled = true
+        } else {
+            primary.title = needsRosetta ? "Enable Rosetta" : (installation?.ready == true ? "Play" : "Install & Play")
+            primary.isEnabled = !busy && !fatalStartupError && (needsRosetta || installation?.ready == true || installer != nil)
+        }
         choose.title = needsRosetta ? "Check again" : "Choose game installer…"
-        primary.isEnabled = !busy && !fatalStartupError && (needsRosetta || installation?.ready == true || installer != nil)
         choose.isEnabled = !busy && !fatalStartupError && (needsRosetta || installation?.ready != true)
+        choose.isHidden = !needsRosetta && installation?.ready == true
         download.isEnabled = !busy
+        displayChoice.isEnabled = !busy && !fatalStartupError
+        refreshChoice.isEnabled = !busy && !fatalStartupError && preferences.display != .normal
+        automaticLaunch.isEnabled = !busy && !fatalStartupError
+        restore.title = preparingDisplay ? "Cancel test" : "Restore normal display"
+        restore.isHidden = gameDisplay?.active != true
+        restore.isEnabled = gameDisplay?.active == true
         selection.isHidden = needsRosetta || installation?.ready == true
     }
 
+    func savePreferences() throws {
+        try JSONEncoder().encode(preferences).write(to: preferencesURL, options: .atomic)
+    }
+
+    @objc func changePlayOptions() {
+        guard !busy, !fatalStartupError else { return }
+        preferences.display = PlayDisplay.allCases[displayChoice.indexOfSelectedItem]
+        preferences.refreshRate = refreshChoice.indexOfSelectedItem == 1 ? 120 : 60
+        preferences.automaticLaunch = automaticLaunch.state == .on
+        do { try savePreferences(); refreshControls() }
+        catch { showError(error) }
+    }
+
     @objc func primaryAction() {
+        if awaitingDisplayConfirmation {
+            confirmationTimer?.invalidate(); confirmationTimer = nil
+            if let key = pendingDisplayKey { preferences.confirmedDisplays.insert(key) }
+            pendingDisplayKey = nil
+            awaitingDisplayConfirmation = false
+            launchGame()
+            return
+        }
         if needsRosetta {
             let helper = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/Intel Compatibility.app")
             let config = NSWorkspace.OpenConfiguration()
@@ -173,26 +240,91 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         if install && installer == nil { chooseInstaller(); return }
         busy = true
         refreshControls()
-        updateProgress(install ? "Preparing the installation…" : "Opening MapleRoyals…", nil)
-        let selected = installer
-        worker.async {
-            do {
-                if install { try self.installation.install(selected!) }
-                try self.installation.play()
-                DispatchQueue.main.async {
-                    self.busy = false
-                    self.progress.stopAnimation(nil); self.progress.isHidden = true
-                    self.message.stringValue = "The game has closed. Click Play whenever you're ready."
-                    self.refreshControls()
+        if install {
+            updateProgress("Preparing the installation…", nil)
+            let selected = installer!
+            worker.async {
+                do {
+                    try self.installation.install(selected)
+                    DispatchQueue.main.async { self.prepareDisplayAndPlay() }
+                } catch {
+                    DispatchQueue.main.async { self.finishSession(error) }
                 }
-            } catch {
-                DispatchQueue.main.async {
-                    self.busy = false
-                    self.showError(error)
+            }
+        } else { prepareDisplayAndPlay() }
+    }
+
+    func prepareDisplayAndPlay() {
+        guard preferences.display != .normal else { launchGame(); return }
+        preparingDisplay = true
+        updateProgress("Preparing the fullscreen display…", nil)
+        gameDisplay.start(preferences.display, refreshRate: preferences.refreshRate) { result in
+            switch result {
+            case .failure(let error): self.finishSession(error)
+            case .success(let key):
+                self.window.center(); self.window.makeKeyAndOrderFront(nil)
+                if self.preferences.confirmedDisplays.contains(key) {
+                    self.launchGame()
+                } else {
+                    self.pendingDisplayKey = key
+                    self.awaitingDisplayConfirmation = true
+                    self.progress.stopAnimation(nil); self.progress.isHidden = true
+                    self.message.stringValue = "Does the display look right? Choose Keep & Play within 20 seconds. Otherwise your normal display returns and the game will not start."
+                    self.confirmationTimer = Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { [weak self] _ in
+                        self?.cancelDisplayTest()
+                    }
                     self.refreshControls()
                 }
             }
         }
+        refreshControls()
+    }
+
+    func cancelDisplayTest() {
+        confirmationTimer?.invalidate(); confirmationTimer = nil
+        pendingDisplayKey = nil; preparingDisplay = false; awaitingDisplayConfirmation = false
+        let failure = gameDisplay.restore()
+        busy = false
+        progress.stopAnimation(nil); progress.isHidden = true
+        message.stringValue = failure ?? "Normal display restored. The game was not started. Choose a display option and click Play when ready."
+        window.center(); refreshControls()
+    }
+
+    @objc func restoreDisplayNow() {
+        if preparingDisplay { cancelDisplayTest(); return }
+        let failure = gameDisplay.restore()
+        message.stringValue = failure ?? "Normal display restored. Close the game before changing display options."
+        window.center(); refreshControls()
+    }
+
+    func launchGame() {
+        preparingDisplay = false; awaitingDisplayConfirmation = false
+        preferences.hasLaunched = true
+        do { try savePreferences() }
+        catch { finishSession(error); return }
+        updateProgress("Opening MapleRoyals…", nil)
+        refreshControls()
+        worker.async {
+            do {
+                try self.installation.play()
+                DispatchQueue.main.async { self.finishSession(nil) }
+            } catch {
+                DispatchQueue.main.async { self.finishSession(error) }
+            }
+        }
+    }
+
+    func finishSession(_ error: Error?) {
+        confirmationTimer?.invalidate(); confirmationTimer = nil
+        preparingDisplay = false; awaitingDisplayConfirmation = false; pendingDisplayKey = nil
+        let wasScaled = gameDisplay?.active == true
+        let restoreFailure = gameDisplay?.restore()
+        busy = false
+        progress.stopAnimation(nil); progress.isHidden = true
+        if let error = error { showError(error) }
+        else { message.stringValue = wasScaled ? "The game has closed and your normal display is restored. Click Play whenever you're ready." : "The game has closed. Click Play whenever you're ready." }
+        if let failure = restoreFailure { message.stringValue += " " + failure }
+        window.center(); refreshControls()
     }
 
     func updateProgress(_ text: String, _ fraction: Double?) {
@@ -227,6 +359,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         return true
     }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if preparingDisplay { cancelDisplayTest(); return .terminateNow }
         if busy {
             let alert = NSAlert()
             alert.messageText = "Finish setup or close the game first"
@@ -237,6 +370,10 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
             return .terminateCancel
         }
         return .terminateNow
+    }
+    func applicationWillTerminate(_ notification: Notification) {
+        confirmationTimer?.invalidate()
+        _ = gameDisplay?.restore()
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 }

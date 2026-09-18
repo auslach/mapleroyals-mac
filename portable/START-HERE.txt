@@ -1,88 +1,68 @@
-MAPLEROYALS FOR MAC — EXPERIMENTAL PREVIEW
+MAPLEROYALS FOR MAC — EXPERIMENTAL PREVIEW 0.7.0
 
-START HERE
-1. Open MapleRoyals.app in this folder. You can move it to Applications first.
+ONE APP FOR THE GAME AND FULLSCREEN
+Open MapleRoyals.app. Fullscreen controls are inside the launcher; no separate
+display helper is needed. Players do not need Terminal, Python, developer tools,
+Homebrew, CrossOver or Sikarugir.
+
+FIRST-TIME SETUP
+1. Move MapleRoyals.app somewhere you intend to keep it, such as Applications.
 2. Download the official Windows WZ installer from https://royals.ms/downloads.
-   Leave it as an .exe; do not open it in Finder. You do not need IMG.
-3. If the launcher asks for Rosetta, click Enable Rosetta, complete Apple's
+   Leave it as an .exe. You do not need IMG for this setup.
+3. Open the app. If it asks for Rosetta, click Enable Rosetta, complete Apple's
    prompt yourself, then return and click Check again.
-4. Click Choose game installer, select the WZ .exe, then click Install & Play.
-   Leave the launcher open while it downloads about 260 MB of support files.
-5. Complete the Windows installer, keeping C:\MapleRoyals as the destination.
-   Complete included Visual C++ prompts. Turn OFF Launch MapleRoyals in the
-   installer before clicking Finish. Our launcher then starts the game.
+4. Click Choose game installer, select the WZ .exe, then Install & Play.
+   Leave the app open while it downloads about 260 MB of support files.
+5. Complete the Windows installer at C:\MapleRoyals, including Visual C++ prompts.
+   Turn OFF Launch MapleRoyals in the installer before clicking Finish.
 6. Sign in with your own account. Start with 800x600 for smoother performance.
 
-You do not need Terminal, Python, Xcode, Command Line Tools, Homebrew or CrossOver.
-Use an Apple Silicon Mac running macOS 14–27 and allow about 10 GB free for setup.
-Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0.
-This is launcher version 0.6.1.
+Use an Apple Silicon Mac running macOS 14–27 with about 10 GB free for setup.
+Testing used one M1 Pro on macOS 26.5.2 and 27.0; another Mac remains unverified.
 
-GETTING THIS APP
-The repository includes this ready-built ZIP at download/MapleRoyals-Mac.zip.
-If you cloned the repository or unpacked its Code > Download ZIP archive, open
-that file in its download folder. You do not need to build anything.
-Direct app download:
+ALREADY INSTALLED?
+Close the game and quit the old launcher. Restore and quit any old fullscreen
+helper too. Replace MapleRoyals.app with this version. Open it, choose your
+Display option, and click Play. Your game installation stays in place. Do not
+delete the data folder or reinstall the game.
+
+PLAYING AND FULLSCREEN
+1. Choose Normal Mac display, Fullscreen scaling — 800x600, or
+   Fullscreen scaling — 1024x768. For fullscreen, select 60 Hz or 120 Hz.
+   Use 120 Hz only with a compatible display such as a ProMotion MacBook Pro.
+2. Click Play. A new fullscreen mode shows a 20-second test: click Keep & Play
+   if it looks right. Cancel or wait to restore your display without launching.
+3. In the game, select the matching resolution. Use Option+Return if needed
+   to hide its window borders. Use 800x600 in the game with the 800x600 display.
+4. Keep the launcher open. Close the game normally when finished; the launcher
+   restores your normal display after the game processes exit.
+5. Leave Start automatically next time checked for later double-click launches,
+   or turn it off to choose settings before every session. Confirmed fullscreen
+   modes do not repeat the test. Change display options while the game is closed.
+
+Fullscreen scaling changes the WHOLE Mac desktop while playing. Restore normal
+display in the launcher can undo it early. It does not fix 1024x768 graphics lag.
+Startup has sometimes taken about 90 seconds after a macOS upgrade.
+
+IF MACOS BLOCKS FIRST OPEN
+This hobby app uses no Apple Developer account and is not notarized. If macOS
+says the developer is unidentified or Apple cannot check the app, and you trust
+this unchanged app from the repository, try opening once, then go to System
+Settings > Privacy & Security > Open Anyway and confirm Open.
+Do not disable security or override a malware/damaged-app warning.
+Apple's instructions: https://support.apple.com/en-us/102445
+
+DOWNLOADS AND SUPPORT
+The repository includes the ready-built download/MapleRoyals-Mac.zip. A clone
+or Code > Download ZIP includes that file; players do not build anything.
+Download:
 https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip
 Full player guide:
 https://github.com/auslach/mapleroyals-mac/blob/main/docs/PLAYER_GUIDE.md
 
-UPDATING AN EXISTING INSTALLATION
-If no game window appears after upgrading to macOS 27, this version fixes the
-startup order. Close the game and quit the old launcher. Replace your old
-MapleRoyals.app with the one in this ZIP, then open it. It reuses the existing
-game installation; do not delete the game data folder or reinstall the game.
-
-NEXT TIME
-Open MapleRoyals.app. It starts the installed game automatically.
-If the launcher is still open after a session, click Play.
-Keep the launcher open while playing. Close the game before quitting the launcher.
-The launcher supports one game client at a time.
-
-FULLSCREEN WITH BLACK SIDE BARS
-The Optional fullscreen folder contains separate, ready-built display apps.
-1. Close the game first.
-2. Open MapleRoyals Display 60 Hz.app. The 120 Hz app is for a compatible
-   ProMotion MacBook Pro. Run only one display app at a time.
-3. Choose 800x600 or 1024x768 in the Resolution menu, click Test,
-   then Keep this display within 20 seconds.
-   If you do nothing, your display returns to normal automatically.
-4. Leave the display app open, launch MapleRoyals, and use Option+Return inside
-   the game if needed. Select the game resolution separately: use 800x600
-   in the game with the 800x600 display so its window fits.
-5. After playing, close the game, then click Restore normal display in the
-   display app, or quit that display app with Command+Q.
-
-To change sizes, close the game and Restore normal display first, then choose
-the other resolution and Test/Keep again. Both helpers are version 0.2; if your
-old helper has no Resolution menu, replace it with the one in this ZIP.
-
-This scales the WHOLE Mac screen while active, including other apps. Closing the
-game alone does not restore your screen. It does not fix 1024x768 game lag.
-The 800x600/120 Hz mode was accepted and restored on macOS 27. Its picture
-and gameplay performance have not been separately confirmed.
-
-IF MACOS BLOCKS FIRST OPEN
-This hobby app uses no Apple Developer account and is not notarized. If the
-warning says the developer is unidentified or Apple cannot check the app, and
-you trust this unchanged copy from the repository:
-1. Attempt to open the app once.
-2. Go to System Settings > Privacy & Security.
-3. Find the notice for this app, click Open Anyway, then confirm Open.
-The Rosetta/display helpers may need their own first-open approval.
-Do not disable system security or override a malware/damaged-app warning.
-Managed Macs may not permit these exceptions. Apple's instructions:
-https://support.apple.com/en-us/102445
-
-YOUR FILES AND SUPPORT
-Your installed game lives in your account under:
-~/Library/Application Support/MapleRoyalsLauncher
-Moving the app does not move or delete this game data.
-No game assets, Wine runtime, used prefix or account data are included in this ZIP.
-The app downloads the Wine runtime separately. Normal game network connections occur.
-
-Fresh installation, character loading on retry, map changes and reopening passed
-on the original M1 Pro. One initial character-loading failure is unexplained.
-Another Mac, first-open security/Rosetta prompts and long sessions remain untested.
-Use Show log if something fails. Review logs for private details before sharing;
-never share your password or PIC. Full instructions are at the player-guide link above.
+Your game data stays at ~/Library/Application Support/MapleRoyalsLauncher.
+The app ZIP contains no game assets, Wine runtime, used prefix or account data.
+The app downloads its Wine runtime; get the official game separately.
+Use Show log for errors. Review logs for private details before sharing. Never
+share passwords or PIC. A second Mac, forced-quit recovery and long-session
+reliability remain unverified. One client at a time is supported.
