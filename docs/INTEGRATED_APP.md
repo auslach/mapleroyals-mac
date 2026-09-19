@@ -1,4 +1,4 @@
-# Combined launcher and fullscreen controls (0.7.1)
+# Combined launcher and fullscreen controls (0.7.2)
 
 The player ZIP now contains one **MapleRoyals.app**. Its native UI manages the game and optional fullscreen scaling. The older separate display helpers remain as developer source but are no longer packaged for players.
 
@@ -6,17 +6,17 @@ The player ZIP now contains one **MapleRoyals.app**. Its native UI manages the g
 
 - Every opening selects **800×600** without changing the screen or starting Wine. Old auto-launch preferences are ignored.
 - Choices: normal display, fullscreen scaling at **800×600**, or fullscreen scaling at **1024×768**. Fullscreen offers **60 Hz** and **120 Hz**. Menu changes alone have no display side effects.
-- **Change screen resolution** applies the choice. A new display/mode combination gets a 20-second **Keep resolution** test. Timeout, cancellation or quitting during preview restores the display. Confirmation returns to idle without starting the game.
+- **Change screen resolution** applies the choice. A new display/mode combination gets a 20-second **Keep resolution** test. Timeout, cancellation or quitting during preview restores the display. Confirmation finishes only the display change; an existing game keeps running.
 - **Play** starts only the unchanged CX24/OpenGL game using the current screen. It never applies the pending display choice. Skipping the resolution button keeps the normal Mac display.
 - **Install game** prepares a first installation and returns to Ready; it does not start the game.
-- The app restores its display when the game session finishes, startup fails or the idle launcher quits. A **Restore normal display** button is available before and during gameplay. Quit the game before changing mode.
+- The app restores its display when the game session finishes, startup fails or the idle launcher quits. A **Restore normal display** button is available before and during gameplay. Size, refresh rate and Change screen resolution also stay available while the game runs; they pause only while a display change is being applied or confirmed.
 - Game resolution remains a game setting. Use 800×600 in the game with the 800×600 display choice, and Option+Return if its window borders are still visible.
 
 Fullscreen still scales the entire Mac desktop while active. This does not implement game-only stretching or fix 1024×768 rendering performance.
 
 ## Implementation
 
-`portable/GameDisplay.swift` owns the virtual display, original physical mode and cancellation generation. It uses the same private CoreGraphics declarations as the earlier DeskPad-derived helper. UI state and display work run on the AppKit thread; setup and Wine run on the existing worker queue. The app links only Apple's frameworks and provisions the pinned Wine runtime as before.
+`portable/GameDisplay.swift` owns the virtual display, original physical mode and cancellation generation. It uses the same private CoreGraphics declarations as the earlier DeskPad-derived helper. Game-worker activity and display preparation have independent state. Completing or canceling a display operation cannot enable a second Play or release prefix ownership; game exit cancels a pending display operation. UI state and display work run on the AppKit thread; setup and Wine run on the existing worker queue. The app links only Apple's frameworks and provisions the pinned Wine runtime as before.
 
 `play-preferences.json` lives beside `installation.json` in the user's Application Support directory. It stores the refresh rate and confirmation keys (physical display UUID, macOS major version, size and refresh rate). The file is not bundled or committed. The existing installed game, runtime, prefix and registry settings are reused.
 
@@ -52,3 +52,14 @@ On the original M1 Pro/macOS 27, computer use verified:
 - Restore normal display before gameplay and quitting an idle launcher with an applied display both restored the original mode; unmirror, mode and completion return codes were all 0.
 
 The Swift build and bundle signature checks passed. These 0.7.1 checks intentionally exercised the launcher without starting the game; they do not constitute a new gameplay acceptance run or a fresh-install test. Game execution and the runtime remain unchanged from the previous version.
+
+## Validation: 0.7.2
+
+On the original M1 Pro/macOS 27, one explicit Play started the unchanged CX24/OpenGL game process. Computer use then exercised the display controls while that session remained active:
+
+- Applied 800×600/120 Hz, then selected and applied 1024×768/120 Hz and kept its new-mode confirmation.
+- Restored the normal display without ending the game session.
+- Applied an unconfirmed 1024×768/60 Hz mode, then canceled its preview. Display controls became available again and Play remained disabled.
+- The log contained exactly one Wine game-launch command throughout these changes, with no intervening game exit. Every mirror, unmirror and mode-restoration operation returned success (0).
+
+The app compiled and its signatures verified. These checks establish the launcher controls and continued process lifetime; they do not independently establish character/map rendering after each switch or performance. The game’s own resolution must still be changed separately. Gameplay after switching and failure/exit races need further coverage; the implementation preserves the game lock on display failure and cancels pending display work on game exit.

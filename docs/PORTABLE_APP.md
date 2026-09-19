@@ -45,7 +45,7 @@ The runtime is `WS12WineCX24.0.7_5` plus Template 1.0.15 native libraries. The e
 
 The main app uses only Apple's shipped frameworks and command-line executables (`arch`, `uname`, `tar`) plus the downloaded Wine runtime. Those system executables do not require installing developer tools. Compiling the ZIP is the maintainer's job.
 
-The launcher stays open while setup/game processes run. Close the game before quitting the launcher. Simultaneous clients are deliberately unavailable in this version. Version 0.7.1 separates display and game actions: every opening selects 800×600 without applying it; Change screen resolution applies the pending size/rate; Play alone starts the game. Setup finishes at Ready. Legacy auto-launch preferences are ignored. The app restores its display when the game session ends or the idle launcher quits. See [integration details and validation](INTEGRATED_APP.md).
+The launcher stays open while setup/game processes run. Close the game before quitting the launcher. Simultaneous clients are deliberately unavailable in this version. Version 0.7.2 separates display and game actions: every opening selects 800×600 without applying it; Change screen resolution applies the pending size/rate; Play alone starts the game. Setup finishes at Ready. Legacy auto-launch preferences are ignored. The app restores its display when the game session ends or the idle launcher quits. See [integration details and validation](INTEGRATED_APP.md).
 
 ## Build the ZIP (maintainer only)
 

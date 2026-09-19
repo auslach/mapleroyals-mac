@@ -121,15 +121,15 @@ Known limits include one unexplained initial character-loading failure, poorer 1
 
 ## Integrated fullscreen lifecycle
 
-Version 0.7.1 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
+Version 0.7.2 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
 
 The launcher offers normal display or non-HiDPI 800×600/1024×768 scaling, with 60/120 Hz. Every opening selects 800×600 without applying it or starting Wine. `play-preferences.json` stores only the refresh rate and previously confirmed display/mode combinations. Legacy selection/auto-launch fields are ignored when decoding. Confirmation keys include the physical display UUID and macOS major version; never distribute this user file.
 
 1. Startup checks installation readiness and Rosetta, then waits. Install game prepares the installation and returns to Ready without launching the game.
 2. Only Change screen resolution creates the virtual display and mirrors it to the built-in screen. Selecting a menu item only changes the pending choice. A delayed callback uses a generation token so cancellation cannot affect a subsequent session.
-3. A new display/mode combination gets a 20-second Keep resolution / Cancel test. Timeout/cancel restores the physical mode. Acceptance returns to idle without starting Wine. Accepted modes are remembered.
+3. A new display/mode combination gets a 20-second Keep resolution / Cancel test. Timeout/cancel restores the physical mode. Acceptance completes the display operation without starting Wine or changing whether the game is running. Accepted modes are remembered.
 4. Only Play starts the unchanged Explorer-first CX24 game command, using whichever display is currently active. After `play()` finishes waiting for Wine children, restore the display on the AppKit thread. The same cleanup runs on startup errors; normal launcher termination releases any owned virtual display.
-5. Restore normal display is available before or during gameplay. Quitting during a display preview cancels it; quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
+5. Size, refresh rate, Change screen resolution and Restore normal display remain available during gameplay. Worker activity and display preparation have separate state; display completion/cancel/error never releases the game-session lock or enables a second Play. Game exit cancels any pending display callback/test before restoring. Quitting during a display preview cancels it; quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
 
 Fullscreen scaling still changes the whole desktop. Game resolution and Option+Return remain game settings. Forced termination, sleep/wake, multiple monitors and newer macOS private-API changes are not guaranteed to recover correctly. No graphics-performance fix is claimed. See [the integrated app validation](INTEGRATED_APP.md).
 

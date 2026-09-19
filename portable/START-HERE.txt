@@ -1,4 +1,4 @@
-MAPLEROYALS FOR MAC — EXPERIMENTAL PREVIEW 0.7.1
+MAPLEROYALS FOR MAC — EXPERIMENTAL PREVIEW 0.7.2
 
 ONE APP FOR THE GAME AND FULLSCREEN
 Open MapleRoyals.app. Fullscreen controls are inside the launcher; no separate
@@ -39,6 +39,10 @@ PLAYING AND FULLSCREEN
    to hide its window borders. Use 800x600 in the game with the 800x600 display.
 6. Keep the launcher open. Close the game normally when finished; the launcher
    restores your normal display after the game processes exit.
+
+You can change size/rate while playing: choose the settings and click Change
+screen resolution. This keeps the same game session; no restart is needed.
+Set the game's own resolution separately to match.
 
 Each opening selects 800x600 again. The refresh rate and confirmed display modes
 are remembered, but nothing is applied until you click Change screen resolution.

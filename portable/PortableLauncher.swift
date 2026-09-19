@@ -26,7 +26,10 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     let worker = DispatchQueue(label: "local.mapleroyals.setup", qos: .userInitiated)
     var installation: PortableInstallation!
     var installer: URL?
+    // Worker activity is independent of temporary display changes.
     var busy = false
+    var gameRunning = false
+    var canChangeDisplay: Bool { !fatalStartupError && !preparingDisplay && (!busy || gameRunning) }
     var needsRosetta = false
     var fatalStartupError = false
 
@@ -166,15 +169,15 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
 
     func refreshControls() {
         primary.title = needsRosetta ? "Enable Rosetta" : (installation?.ready == true ? "Play" : "Install game")
-        primary.isEnabled = !busy && !fatalStartupError && (needsRosetta || installation?.ready == true || installer != nil)
+        primary.isEnabled = !busy && !preparingDisplay && !fatalStartupError && (needsRosetta || installation?.ready == true || installer != nil)
         choose.title = needsRosetta ? "Check again" : "Choose game installer…"
-        choose.isEnabled = !busy && !fatalStartupError && (needsRosetta || installation?.ready != true)
+        choose.isEnabled = !busy && !preparingDisplay && !fatalStartupError && (needsRosetta || installation?.ready != true)
         choose.isHidden = !needsRosetta && installation?.ready == true
-        download.isEnabled = !busy
-        displayChoice.isEnabled = !busy && !fatalStartupError
-        refreshChoice.isEnabled = !busy && !fatalStartupError && selectedDisplay != .normal
+        download.isEnabled = !busy && !preparingDisplay
+        displayChoice.isEnabled = canChangeDisplay
+        refreshChoice.isEnabled = canChangeDisplay && selectedDisplay != .normal
         applyDisplay.title = awaitingDisplayConfirmation ? "Keep resolution" : "Change screen resolution"
-        applyDisplay.isEnabled = awaitingDisplayConfirmation || (!busy && !fatalStartupError && gameDisplay != nil)
+        applyDisplay.isEnabled = awaitingDisplayConfirmation || (canChangeDisplay && gameDisplay != nil)
         restore.title = preparingDisplay ? "Cancel test" : "Restore normal display"
         restore.isHidden = gameDisplay?.active != true
         restore.isEnabled = gameDisplay?.active == true
@@ -186,7 +189,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     @objc func changePlayOptions() {
-        guard !busy, !fatalStartupError else { return }
+        guard canChangeDisplay else { return }
         selectedDisplay = PlayDisplay.allCases[displayChoice.indexOfSelectedItem]
         preferences.refreshRate = refreshChoice.indexOfSelectedItem == 1 ? 120 : 60
         do { try savePreferences(); refreshControls() }
@@ -227,7 +230,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     func start(install: Bool) {
-        guard !busy, !needsRosetta, !fatalStartupError else { return }
+        guard !busy, !preparingDisplay, !needsRosetta, !fatalStartupError else { return }
         if install && installer == nil { chooseInstaller(); return }
         busy = true
         refreshControls()
@@ -255,25 +258,25 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
             confirmationTimer?.invalidate(); confirmationTimer = nil
             if let key = pendingDisplayKey { preferences.confirmedDisplays.insert(key) }
             do { try savePreferences() }
-            catch { finishSession(error); return }
+            catch { finishDisplay(error); return }
             displayReady()
             return
         }
-        guard !busy, !fatalStartupError else { return }
+        guard canChangeDisplay else { return }
         if let failure = gameDisplay.restore() {
             showError(SetupError(message: failure))
             return
         }
         guard selectedDisplay != .normal else {
-            message.stringValue = "Normal display restored. Click Play to start the game."
+            message.stringValue = gameRunning ? "Normal display restored. The game session is still running." : "Normal display restored. Click Play to start the game."
             window.center(); refreshControls()
             return
         }
-        busy = true; preparingDisplay = true
         updateProgress("Changing screen resolution…", nil)
+        preparingDisplay = true
         gameDisplay.start(selectedDisplay, refreshRate: preferences.refreshRate) { result in
             switch result {
-            case .failure(let error): self.finishSession(error)
+            case .failure(let error): self.finishDisplay(error)
             case .success(let key):
                 self.window.center(); self.window.makeKeyAndOrderFront(nil)
                 if self.preferences.confirmedDisplays.contains(key) {
@@ -282,7 +285,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
                     self.pendingDisplayKey = key
                     self.awaitingDisplayConfirmation = true
                     self.progress.stopAnimation(nil); self.progress.isHidden = true
-                    self.message.stringValue = "Does the display look right? Choose Keep resolution within 20 seconds, or your normal display returns. This does not start the game."
+                    self.message.stringValue = "Does the display look right? Choose Keep resolution within 20 seconds, or your normal display returns. This only changes the display."
                     self.confirmationTimer = Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { [weak self] _ in
                         self?.cancelDisplayTest()
                     }
@@ -295,30 +298,35 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
 
     func displayReady() {
         pendingDisplayKey = nil; preparingDisplay = false; awaitingDisplayConfirmation = false
-        busy = false
         progress.stopAnimation(nil); progress.isHidden = true
-        message.stringValue = "Screen resolution applied. Click Play when you want to start the game."
+        message.stringValue = gameRunning ? "Screen resolution applied. The game session is still running." : "Screen resolution applied. Click Play when you want to start the game."
         refreshControls()
     }
 
-    func cancelDisplayTest() {
+    func finishDisplay(_ error: Error? = nil) {
         confirmationTimer?.invalidate(); confirmationTimer = nil
         pendingDisplayKey = nil; preparingDisplay = false; awaitingDisplayConfirmation = false
         let failure = gameDisplay.restore()
-        busy = false
         progress.stopAnimation(nil); progress.isHidden = true
-        message.stringValue = failure ?? "Normal display restored. The game was not started. Click Change screen resolution to try again, or Play to use your current display."
+        if let error = error { showError(error) }
+        else {
+            message.stringValue = gameRunning ? "Normal display restored. The game session is still running." : "Normal display restored. Click Change screen resolution to try again, or Play to use your current display."
+        }
+        if let failure = failure { message.stringValue += " " + failure }
         window.center(); refreshControls()
     }
+
+    func cancelDisplayTest() { finishDisplay() }
 
     @objc func restoreDisplayNow() {
         if preparingDisplay { cancelDisplayTest(); return }
         let failure = gameDisplay.restore()
-        message.stringValue = failure ?? (busy ? "Normal display restored. Close the game before changing display options." : "Normal display restored. Click Play to start the game.")
+        message.stringValue = failure ?? (gameRunning ? "Normal display restored. The game session is still running." : "Normal display restored. Click Play to start the game.")
         window.center(); refreshControls()
     }
 
     func launchGame() {
+        gameRunning = true
         preparingDisplay = false; awaitingDisplayConfirmation = false
         updateProgress("Opening MapleRoyals…", nil)
         refreshControls()
@@ -333,6 +341,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     func finishSession(_ error: Error?) {
+        gameRunning = false
         confirmationTimer?.invalidate(); confirmationTimer = nil
         preparingDisplay = false; awaitingDisplayConfirmation = false; pendingDisplayKey = nil
         let wasScaled = gameDisplay?.active == true
@@ -346,6 +355,8 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     func updateProgress(_ text: String, _ fraction: Double?) {
+        // A late Wine progress callback must not obscure a live display confirmation.
+        guard !gameRunning || !preparingDisplay else { return }
         message.stringValue = text
         progress.isHidden = false
         if let fraction = fraction {
@@ -377,7 +388,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         return true
     }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if preparingDisplay { cancelDisplayTest(); return .terminateNow }
+        if preparingDisplay { cancelDisplayTest() }
         if busy {
             let alert = NSAlert()
             alert.messageText = "Finish setup or close the game first"

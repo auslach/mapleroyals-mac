@@ -69,3 +69,7 @@ The current ZIP integrates the fullscreen controls into MapleRoyals.app and no l
 ## September 18: explicit launcher controls 0.7.1
 
 Version 0.7.1 replaces automatic startup with independent Change screen resolution and Play buttons. It always opens idle with 800×600 selected and ignores old auto-launch settings. First-time setup finishes at Ready. See [current behavior and validation](INTEGRATED_APP.md) and the adjacent download checksum.
+
+## September 18: live resolution controls 0.7.2
+
+Resolution size/rate and Change screen resolution remain available during gameplay. Display operations preserve the running game session; Play remains disabled until that session closes. See [current behavior and validation](INTEGRATED_APP.md) and the adjacent checksum.
