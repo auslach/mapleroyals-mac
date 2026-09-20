@@ -6,7 +6,7 @@ Download the app from this repository and follow the steps below. You do **not**
 
 ## What you need
 
-- An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0; another Mac may need troubleshooting. Use the current launcher 0.7.2, which includes the macOS 27 startup fix and fullscreen controls.
+- An Apple Silicon Mac, such as an M1, M2, M3 or later, running macOS 14–27. Gameplay has been tested on one M1 Pro on macOS 26.5.2 and 27.0; another Mac may need troubleshooting. Use the current launcher 0.7.3, which includes the macOS 27 startup fix and fullscreen controls.
 - An internet connection and about 10 GB of free space before setup. This is a practical allowance, not a measured minimum.
 - Your own MapleRoyals account and the official **Windows WZ installer**.
 - [MapleRoyals-Mac.zip](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip), available directly from this repository.
@@ -14,8 +14,6 @@ Download the app from this repository and follow the steps below. You do **not**
 ## 1. Get the app and game installer
 
 **[Click here to download MapleRoyals-Mac.zip for Apple Silicon Macs](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip).** This is the ready-built app with fullscreen controls included.
-
-This repository is currently private. If the link asks you to sign in or shows **404 / Not Found**, sign in to a GitHub account with access to this repository.
 
 **If you already cloned the repository:** in Finder, open your local repository folder, then **download → MapleRoyals-Mac.zip**. Use that included ZIP; you do not need to build anything or download another copy.
 
@@ -51,13 +49,15 @@ If macOS asks for access to Downloads so the app can read the installer you sele
 
 ## Updating an existing installation
 
-If the app stopped showing a game window after a macOS 27 upgrade, get the current ZIP from [the same download link](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip). It contains launcher **0.7.2**, which includes the startup fix and fullscreen controls.
+If the app stopped showing a game window after a macOS 27 upgrade, get the current ZIP from [the same download link](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip). It contains launcher **0.7.3**, which includes the startup fix and fullscreen controls.
 
 1. Close the game normally and quit the old launcher. If you used an old fullscreen helper, restore your display and quit that helper too.
 2. Unpack the new ZIP. Replace the old **MapleRoyals.app** with the new one, wherever you keep it.
 3. Open the new app. It finds the game already installed in your Mac account. For fullscreen, choose a size and click **Change screen resolution**, then **Play**. To keep your normal Mac desktop, just click **Play**. You do not need the installer again. Game startup after the macOS upgrade has sometimes taken about 90 seconds; leave the launcher open while it starts.
 
 Keep `~/Library/Application Support/MapleRoyalsLauncher` in place. Replacing the app does not replace or delete your game data. This update fixes startup; it does not claim to improve 1024×768 performance.
+
+If setup failed before the Windows installer appeared, restart your Mac once after replacing the app, select the same WZ installer, and click **Install game** again. Version 0.7.3 initializes the Windows desktop before opening the installer. Keep the existing data folder; if setup still fails, use **Show log** and share the log privately with the maintainer.
 
 ## Playing next time
 
@@ -105,7 +105,7 @@ Do not disable system security or override a malware/damaged-app warning. Work o
 | Download link shows 404 / Not Found | This repository is private. Sign in to GitHub with an account that has access. |
 | Source files but no app | Open **download → MapleRoyals-Mac.zip** in the repository folder and unpack that ZIP. You do not need to run `setup.py`. |
 | Setup stopped partway through | Close the game and installer, quit the launcher, then reopen it and choose the official installer again if asked. Keep the installer until setup finishes. If the problem repeats, use **Show log** and contact the maintainer. |
-| No game window after upgrading to macOS 27 | Follow **Updating an existing installation** above. Use launcher 0.7.2; do not delete or reinstall your game data. |
+| No game window after upgrading to macOS 27 | Follow **Updating an existing installation** above. Use launcher 0.7.3; do not delete or reinstall your game data. |
 | The game fails when selecting a character | One initial failure occurred during testing, followed by a successful retry. Its cause is unknown. If it repeats, report whether the entire game closed or it returned to login. |
 | 1024×768 feels laggy | Use **800×600**. Fullscreen scaling does not fix this rendering-performance difference. |
 | The game stays small in the top-left corner | Follow the fullscreen steps above. The game's fullscreen toggle alone did not scale correctly on the tested Mac. |
@@ -114,4 +114,4 @@ Do not disable system security or override a malware/damaged-app warning. Work o
 
 Logs can contain your local username and file paths. Review them before sharing, and never send your password, PIC or the whole game folder.
 
-Fresh setup, character loading on retry, map changes, normal shutdown and reopening were confirmed on the original M1 Pro. Another Mac and long-session reliability remain unverified. For the full record, see [the test results](ZIP_ACCEPTANCE.md).
+Fresh setup, character loading on retry, map changes, normal shutdown and reopening were confirmed on the original M1 Pro. The installer startup fix was also confirmed on a second M1 Pro running macOS 27.0. Long-session reliability remains unverified. For the full record, see [the test results](ZIP_ACCEPTANCE.md).

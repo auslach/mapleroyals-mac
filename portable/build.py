@@ -10,7 +10,7 @@ import tempfile
 
 SOURCE = Path(__file__).resolve().parent
 REPO = SOURCE.parent
-VERSION = '0.7.3-setup.1'
+VERSION = '0.7.3'
 
 
 def run(*args):

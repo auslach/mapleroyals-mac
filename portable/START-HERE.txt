@@ -1,12 +1,13 @@
-MAPLEROYALS FOR MAC — SETUP TEST 0.7.3-setup.1
+MAPLEROYALS FOR MAC — VERSION 0.7.3
 
 RETRYING A FAILED SETUP
-This test build starts the Windows desktop before opening the game installer
-and adds detailed setup logging. A fix on the affected Mac is not yet confirmed.
+Version 0.7.3 starts the Windows desktop before opening the game installer
+and adds detailed setup logging. This resolved the reported installer startup
+failure on a second M1 Pro Mac.
 Quit the old launcher and restart your Mac once to clear any stuck Wine processes.
 Replace the old MapleRoyals.app with this one, choose the same WZ installer,
 and click Install game. Keep your existing MapleRoyalsLauncher data folder.
-Do not change screen resolution during this setup test.
+Keep the normal Mac display while completing setup.
 If it fails or no installer window appears after several minutes, click Show log
 and send launcher.log privately to the maintainer. It may contain your Mac user
 name and local file paths. Detailed logging applies to setup, not normal play.
@@ -29,7 +30,8 @@ FIRST-TIME SETUP
 6. Wait for Ready, click Play, then sign in with your own account. Start with 800x600 for smoother performance.
 
 Use an Apple Silicon Mac running macOS 14–27 with about 10 GB free for setup.
-Testing used one M1 Pro on macOS 26.5.2 and 27.0; another Mac remains unverified.
+Gameplay testing used an M1 Pro on macOS 26.5.2 and 27.0. Installer startup
+was also confirmed on a second M1 Pro running macOS 27.0.
 
 ALREADY INSTALLED?
 Close the game and quit the old launcher. Restore and quit any old fullscreen
@@ -84,5 +86,5 @@ Your game data stays at ~/Library/Application Support/MapleRoyalsLauncher.
 The app ZIP contains no game assets, Wine runtime, used prefix or account data.
 The app downloads its Wine runtime; get the official game separately.
 Use Show log for errors. Review logs for private details before sharing. Never
-share passwords or PIC. A second Mac, forced-quit recovery and long-session
+share passwords or PIC. Forced-quit recovery and long-session
 reliability remain unverified. One client at a time is supported.
