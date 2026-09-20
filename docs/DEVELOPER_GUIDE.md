@@ -121,7 +121,7 @@ Known limits include one unexplained initial character-loading failure, poorer 1
 
 ## Integrated fullscreen lifecycle
 
-Version 0.7.3 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
+Version 0.1.0 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
 
 The launcher offers normal display or non-HiDPI 800×600/1024×768 scaling, with 60/120 Hz. Every opening selects 800×600 without applying it or starting Wine. `play-preferences.json` stores only the refresh rate and previously confirmed display/mode combinations. Legacy selection/auto-launch fields are ignored when decoding. Confirmation keys include the physical display UUID and macOS major version; never distribute this user file.
 

@@ -1,7 +1,7 @@
-MAPLEROYALS FOR MAC — VERSION 0.7.3
+MAPLEROYALS FOR MAC — VERSION 0.1.0
 
 RETRYING A FAILED SETUP
-Version 0.7.3 starts the Windows desktop before opening the game installer
+Version 0.1.0 starts the Windows desktop before opening the game installer
 and adds detailed setup logging. This resolved the reported installer startup
 failure on a second M1 Pro Mac.
 Quit the old launcher and restart your Mac once to clear any stuck Wine processes.

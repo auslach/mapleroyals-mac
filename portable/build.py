@@ -10,7 +10,7 @@ import tempfile
 
 SOURCE = Path(__file__).resolve().parent
 REPO = SOURCE.parent
-VERSION = '0.7.3'
+VERSION = '0.1.0'
 
 
 def run(*args):
@@ -21,7 +21,7 @@ def bundle(path, executable, identifier, name, **extra):
     (path / 'Contents/MacOS').mkdir(parents=True)
     (path / 'Contents/Resources').mkdir()
     info = dict(CFBundleExecutable=executable, CFBundleIdentifier=identifier,
-                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.7.3',
+                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.1.0',
                 CFBundleShortVersionString=VERSION, LSMinimumSystemVersion='14.0',
                 NSHighResolutionCapable=True, **extra)
     (path / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
