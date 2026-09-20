@@ -10,7 +10,7 @@ import tempfile
 
 SOURCE = Path(__file__).resolve().parent
 REPO = SOURCE.parent
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 
 def run(*args):
@@ -21,7 +21,7 @@ def bundle(path, executable, identifier, name, **extra):
     (path / 'Contents/MacOS').mkdir(parents=True)
     (path / 'Contents/Resources').mkdir()
     info = dict(CFBundleExecutable=executable, CFBundleIdentifier=identifier,
-                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.1.0',
+                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion=VERSION,
                 CFBundleShortVersionString=VERSION, LSMinimumSystemVersion='14.0',
                 NSHighResolutionCapable=True, **extra)
     (path / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
@@ -46,7 +46,7 @@ def main():
         cache = temporary / 'module-cache'
         run('xcrun', 'swiftc', '-swift-version', '5', '-O', '-target', 'arm64-apple-macos14.0',
             '-module-cache-path', cache, '-import-objc-header', REPO / 'display/CGVirtualDisplayPrivate.h',
-            SOURCE / 'PortableCore.swift', SOURCE / 'GameDisplay.swift', SOURCE / 'PortableLauncher.swift',
+            SOURCE / 'PortableCore.swift', SOURCE / 'GameClients.swift', SOURCE / 'GameDisplay.swift', SOURCE / 'PortableLauncher.swift',
             '-o', app / 'Contents/MacOS/MapleRoyals')
         helper = app / 'Contents/Helpers/Intel Compatibility.app'
         bundle(helper, 'IntelCompatibility', 'local.mapleroyals.intel-compatibility', 'Intel Compatibility', LSUIElement=True)

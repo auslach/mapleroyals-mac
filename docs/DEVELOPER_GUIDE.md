@@ -44,7 +44,7 @@ The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatib
 
 **The ready-to-run player download is tracked at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip).** A clone and GitHub's Code → Download ZIP both include this app archive. The README also links directly to its download. Players do not build the app.
 
-The builder writes new builds to ignored `dist/` outputs; it does not automatically replace the tracked download or publish a GitHub release. To update the player download, build into a new output directory, validate the package and gameplay, then replace the single tracked ZIP, update its adjacent SHA-256 file and [acceptance record](ZIP_ACCEPTANCE.md), and commit them with any changed setup instructions. The current tracked package contains the combined launcher; its acceptance record distinguishes versions and validation scope.
+The builder writes new builds to ignored `dist/` outputs; it does not automatically replace the tracked download or publish a GitHub release. To update the player download, build into a new output directory, validate the package and gameplay, then replace the single tracked ZIP, update its adjacent SHA-256 file, and commit them with any changed setup instructions. Describe the validation scope and remaining limits in the release notes.
 
 The default build uses ad-hoc signatures and no Apple Developer account, Team Identifier or notarization credentials. `--identity` exists for a future explicitly chosen Developer ID build; it never selects an identity automatically or notarizes/uploads anything. The current hobby workflow deliberately does not require a business Apple identity. See [packaging and licensing notes](PACKAGING.md) before changing distribution strategy.
 
@@ -54,6 +54,7 @@ The default build uses ad-hoc signatures and no Apple Developer account, Team Id
 |---|---|
 | [`portable/PortableLauncher.swift`](../portable/PortableLauncher.swift) | Native AppKit UI, installer selection, Rosetta flow, status and Play controls. |
 | [`portable/GameDisplay.swift`](../portable/GameDisplay.swift) | Saved play options, virtual display creation, mirroring, restoration and cancellation of pending display callbacks. |
+| [`portable/GameClients.swift`](../portable/GameClients.swift) | Concurrent client processes, independent completion callbacks and active-client count on the main thread. |
 | [`portable/PortableCore.swift`](../portable/PortableCore.swift) | Verified downloads, staged runtime extraction, exclusive installation lock, prefix setup, process launch, install marker and logs. |
 | [`portable/RosettaCheck.swift`](../portable/RosettaCheck.swift) | Tiny Intel-only helper that can trigger Apple's Rosetta installation prompt. |
 | [`portable/build.py`](../portable/build.py) | Compile, sign and package the combined app and embedded Rosetta helper. |
@@ -78,7 +79,7 @@ The portable launcher calculates paths from the current user's Application Suppo
   play-preferences.json
 ```
 
-The portable app can move without relocating its data. It does not import the older `MapleRoyals-PoC` installation. On first run it verifies and provisions the runtime, runs the user's official installer, applies settings, and writes the installed marker only after success. Later launches start Wine Explorer, which initializes the window system before starting the installed game. The launcher stays open while the game runs and currently permits one client at a time. See [portable implementation details](PORTABLE_APP.md) for lifecycle and failure behavior.
+The portable app can move without relocating its data. It does not import the older `MapleRoyals-PoC` installation. On first run it verifies and provisions the runtime, runs the user's official installer, applies settings, and writes the installed marker only after success. Later launches start Wine Explorer, which initializes the window system before starting the installed game. One launcher owns the installation lock and manages any number of clients sharing the same installed game and Wine prefix. Earlier [portable implementation details](PORTABLE_APP.md) describe the original single-client lifecycle.
 
 ### Working runtime configuration
 
@@ -93,10 +94,14 @@ The tested configuration is `WS12WineCX24.0.7_5` plus Template 1.0.15 native lib
 The launch command is passed as a process argument array, with the installed game directory as the working directory:
 
 ```text
-wine explorer /desktop=MapleRoyals,1024x768 C:\MapleRoyals\MapleRoyals.exe
+wine explorer /desktop=MapleRoyals-<client-UUID>,1024x768 C:\MapleRoyals\MapleRoyals.exe
 ```
 
 The desktop-first launch avoids the initialization failure observed on macOS 27; see [diagnosis and test results](MACOS_27.md). Errors remain enabled in the normal Wine log. Wine also labels its experimental WoW64 and renderer announcements as errors, so an `err:` line alone does not establish a failed launch.
+
+Each game gets a unique Wine desktop and an independently tracked Explorer process. Do not reuse a desktop name: Explorer may hand the launch to the existing desktop and return before that client exits. Do not call the prefix-wide `wineserver -w` for individual clients: it waits for every client. Setup retains its server waits. Client completion removes only that client's entry; the main-thread callback restores the display only when no clients remain. A failed spawn cannot remove an existing client, and normal client closure never kills the shared wineserver.
+
+The tracked exit status belongs to Explorer, which does not forward the game's exit code. An Explorer exit of zero does not prove the game closed without crashing. During the macOS 27.0 multiclient test, the second client closed during login, then succeeded on retry while the first remained live. Two accounts were confirmed logged in simultaneously. The cause of the intermittent failure is unknown; no graphics, DLL or runtime changes were made for the successful retry. More than two simultaneous game clients remain untested; the process-controller tests use lightweight native processes.
 
 The original [configuration reference](CONFIGURATION.md) documents the older route's generated paths and advanced commands. The portable path construction and environment are in `PortableCore.swift`; do not copy workspace-specific paths into a distributable app.
 
@@ -106,12 +111,15 @@ Run the core regression checks without downloading or executing the game:
 
 ```sh
 mkdir -p build
-xcrun swiftc -swift-version 5 -O -module-cache-path build/module-cache \
+xcrun swiftc -swift-version 5 -O -target arm64-apple-macos14.0 -module-cache-path build/module-cache \
   portable/PortableCore.swift tests/PortableCoreTests.swift -o build/portable-core-tests
 build/portable-core-tests .
+xcrun swiftc -swift-version 5 -O -target arm64-apple-macos14.0 -module-cache-path build/module-cache \
+  portable/PortableCore.swift portable/GameClients.swift tests/GameClientsTests.swift -o build/game-clients-tests
+build/game-clients-tests
 ```
 
-The checks cover tampered downloads, wrong installer input before download, exclusive ownership, portable paths, environment isolation, and preservation of existing runtime data. The ZIP builder also verifies its generated app signatures. These checks do not establish game compatibility.
+The checks cover tampered downloads, wrong installer input before download, exclusive ownership, portable paths, environment isolation, and preservation of existing runtime data. Client checks launch real lightweight processes and exercise simultaneous clients, independent exits, a failed spawn while another client runs, more than two clients, and immediate process exit. The ZIP builder also verifies its generated app signatures. These checks do not establish game compatibility.
 
 For runtime or launch changes, test progressively: executable start, login, world/channel, character/PIC if prompted, game entry, map changes, keyboard/mouse, windowed resolution, normal exit and cold relaunch. Inspect logs at the failing stage. Verify the actual loaded runtime and graphics path instead of inferring it from setup-time GPU enumeration. Only add concurrent-client support after explicit gameplay testing.
 
@@ -121,15 +129,15 @@ Known limits include one unexplained initial character-loading failure, poorer 1
 
 ## Integrated fullscreen lifecycle
 
-Version 0.1.0 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
+Version 0.2.0 links `GameDisplay.swift` and the DeskPad-derived `display/CGVirtualDisplayPrivate.h` into the native launcher. The ZIP contains one player-facing app plus its embedded Rosetta helper. DeskPad's license and provenance notices are copied into the main app's Resources. The standalone `display/build.py` remains available for isolated developer experiments; the portable builder no longer packages those separate apps.
 
 The launcher offers normal display or non-HiDPI 800×600/1024×768 scaling, with 60/120 Hz. Every opening selects 800×600 without applying it or starting Wine. `play-preferences.json` stores only the refresh rate and previously confirmed display/mode combinations. Legacy selection/auto-launch fields are ignored when decoding. Confirmation keys include the physical display UUID and macOS major version; never distribute this user file.
 
 1. Startup checks installation readiness and Rosetta, then waits. Install game prepares the installation and returns to Ready without launching the game.
 2. Only Change screen resolution creates the virtual display and mirrors it to the built-in screen. Selecting a menu item only changes the pending choice. A delayed callback uses a generation token so cancellation cannot affect a subsequent session.
 3. A new display/mode combination gets a 20-second Keep resolution / Cancel test. Timeout/cancel restores the physical mode. Acceptance completes the display operation without starting Wine or changing whether the game is running. Accepted modes are remembered.
-4. Only Play starts the unchanged Explorer-first CX24 game command, using whichever display is currently active. After `play()` finishes waiting for Wine children, restore the display on the AppKit thread. The same cleanup runs on startup errors; normal launcher termination releases any owned virtual display.
-5. Size, refresh rate, Change screen resolution and Restore normal display remain available during gameplay. Worker activity and display preparation have separate state; display completion/cancel/error never releases the game-session lock or enables a second Play. Game exit cancels any pending display callback/test before restoring. Quitting during a display preview cancels it; quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
+4. Play starts the first Explorer-first CX24 game command; Open another client starts each additional one, using whichever display is currently active. Each client has its own desktop name and completion callback. After the last tracked client closes, restore the display on the AppKit thread. A failed launch restores the display only if no other clients are running; normal idle launcher termination releases any owned virtual display.
+5. Size, refresh rate, Change screen resolution and Restore normal display remain available during gameplay. Setup activity, active clients and display preparation have separate state; display completion/cancel/error never releases the installation lock or changes the client count. Open another client stays available except during setup or a display transition. The last client exiting cancels any pending display callback/test before restoring; other client exits leave the display and any confirmation intact. Quitting during a display preview cancels it; quitting during game/setup asks the user to finish that session first, preserving prefix ownership.
 
 Fullscreen scaling still changes the whole desktop. Game resolution and Option+Return remain game settings. Forced termination, sleep/wake, multiple monitors and newer macOS private-API changes are not guaranteed to recover correctly. No graphics-performance fix is claimed. See [the integrated app validation](INTEGRATED_APP.md).
 
@@ -151,7 +159,7 @@ python3 setup.py
 
 In Finder, use **Shift + Command + G** to open `~/Library/Application Support/MapleRoyals-PoC`, then open its `MapleRoyals.app`. Complete the official Windows installer at `C:\MapleRoyals`, including its Visual C++ prompts. Review terms yourself, disable the installer's Launch MapleRoyals checkbox if offered, and click Finish. The launcher applies settings and launches the game. Start with 800×600.
 
-Keep that Application Support folder and its app at their original location. Later launches need no Terminal. After closing a game, the original launcher's **Launch another client** button can start a replacement session; two simultaneous clients remain untested. The portable app instead has a **Play** button and enforces one client.
+Keep that Application Support folder and its app at their original location. Later launches need no Terminal. After closing a game, the original launcher's **Launch another client** button can start a replacement session; two simultaneous clients remain untested. The current portable app has **Play** and **Open another client** controls and tracks clients independently.
 
 For a scripted build and diagnostic options, see [configuration and advanced setup](CONFIGURATION.md). The Terminal recipe itself has not separately completed a fresh-install gameplay test; the later successful fresh installation used the portable ZIP.
 

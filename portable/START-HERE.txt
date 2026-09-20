@@ -1,7 +1,7 @@
-MAPLEROYALS FOR MAC — VERSION 0.1.0
+MAPLEROYALS FOR MAC — VERSION 0.2.0
 
 RETRYING A FAILED SETUP
-Version 0.1.0 starts the Windows desktop before opening the game installer
+The launcher starts the Windows desktop before opening the game installer
 and adds detailed setup logging. This resolved the reported installer startup
 failure on a second M1 Pro Mac.
 Quit the old launcher and restart your Mac once to clear any stuck Wine processes.
@@ -50,8 +50,22 @@ PLAYING AND FULLSCREEN
    Mac display. Play itself does not change the Mac screen resolution.
 5. In the game, select the matching resolution. Use Option+Return if needed
    to hide its window borders. Use 800x600 in the game with the 800x600 display.
-6. Keep the launcher open. Close the game normally when finished; the launcher
-   restores your normal display after the game processes exit.
+6. Keep the launcher open. Close each game normally when finished; the launcher
+   restores your normal display after the last game client closes.
+
+MORE THAN ONE CLIENT
+Click Play for the first game. The button then becomes Open another client.
+Click it again for each additional game window; the launcher has no client limit.
+Sign into a different account in each game window. Use the same launcher for
+all clients, rather than opening extra copies of MapleRoyals.app.
+The launcher shows how many clients are open. Closing one leaves the others
+running. Close every game client before quitting the launcher. All clients
+share the installed files, game settings, and Mac fullscreen display.
+Each additional client uses more memory and graphics resources.
+Two accounts were tested together on an M1 Pro running macOS 27.0, after retrying
+the second client. If a client closes during login, click Open another client
+to retry while leaving any working client open. This intermittent failure is
+unresolved. More than two simultaneous game clients have not been tested.
 
 You can change size/rate while playing: choose the settings and click Change
 screen resolution. This keeps the same game session; no restart is needed.
@@ -87,4 +101,4 @@ The app ZIP contains no game assets, Wine runtime, used prefix or account data.
 The app downloads its Wine runtime; get the official game separately.
 Use Show log for errors. Review logs for private details before sharing. Never
 share passwords or PIC. Forced-quit recovery and long-session
-reliability remain unverified. One client at a time is supported.
+reliability remain unverified.

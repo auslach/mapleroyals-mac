@@ -298,15 +298,24 @@ final class PortableInstallation {
         note("Installation complete")
     }
 
-    func play() throws {
+    static func gameArguments(clientID: UUID) -> [String] {
+        // Reusing a desktop can hand off to an existing Explorer and return early.
+        // A distinct desktop preserves startup ordering and each client's lifetime.
+        ["explorer", "/desktop=MapleRoyals-\(clientID.uuidString),1024x768", "C:\\MapleRoyals\\MapleRoyals.exe"]
+    }
+
+    func gameProcess(clientID: UUID) throws -> Process {
         guard ready else { throw SetupError(message: "Complete the game installation first.") }
-        report("Opening MapleRoyals…", nil)
-        note("Launch environment: \(environment())")
-        // Let Explorer finish initializing the window driver before it starts the game.
-        // Direct game launch can time out waiting for Explorer after a macOS upgrade.
-        try wine(["explorer", "/desktop=MapleRoyals,1024x768", "C:\\MapleRoyals\\MapleRoyals.exe"])
-        // Keep ownership of the prefix until all game child processes have closed.
-        try waitForWine()
+        let child = Process()
+        child.executableURL = engine.appendingPathComponent("bin/wine")
+        child.arguments = Self.gameArguments(clientID: clientID)
+        child.environment = environment()
+        child.currentDirectoryURL = game.deletingLastPathComponent()
+        child.standardOutput = log
+        child.standardError = log
+        note("Client \(clientID): wine \(child.arguments!)")
+        note("Launch environment: \(child.environment!)")
+        return child
     }
 }
 

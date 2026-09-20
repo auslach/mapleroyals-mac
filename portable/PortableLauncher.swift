@@ -5,6 +5,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     let heading = NSTextField(labelWithString: "MapleRoyals")
     let message = NSTextField(wrappingLabelWithString: "Checking this Mac…")
+    let clientCount = NSTextField(labelWithString: "No game clients open")
     let selection = NSTextField(wrappingLabelWithString: "No installer selected")
     let primary = NSButton(title: "Install game", target: nil, action: nil)
     let choose = NSButton(title: "Choose game installer…", target: nil, action: nil)
@@ -15,7 +16,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     let applyDisplay = NSButton(title: "Change screen resolution", target: nil, action: nil)
     var selectedDisplay = PlayDisplay.scaled800
     let restore = NSButton(title: "Restore normal display", target: nil, action: nil)
-    let displayNote = NSTextField(wrappingLabelWithString: "Change screen resolution applies the selected size to the whole Mac screen. Play starts only the game. Your normal display returns when the game closes.")
+    let displayNote = NSTextField(wrappingLabelWithString: "Change screen resolution applies the selected size to the whole Mac screen. Play starts only the game. Your normal display returns after the last game client closes.")
     var preferences = PlayPreferences()
     var gameDisplay: GameDisplay!
     var preparingDisplay = false
@@ -28,8 +29,9 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     var installer: URL?
     // Worker activity is independent of temporary display changes.
     var busy = false
-    var gameRunning = false
-    var canChangeDisplay: Bool { !fatalStartupError && !preparingDisplay && (!busy || gameRunning) }
+    let clients = GameClients()
+    var gameRunning: Bool { clients.count > 0 }
+    var canChangeDisplay: Bool { !fatalStartupError && !preparingDisplay && !busy }
     var needsRosetta = false
     var fatalStartupError = false
 
@@ -43,6 +45,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
                 DispatchQueue.main.async { self?.updateProgress(text, fraction) }
             }
             try installation.open()
+            clients.didExit = { [weak self] client in self?.clientFinished(client) }
             gameDisplay = GameDisplay { [weak self] text in self?.installation?.note(text) }
             if FileManager.default.fileExists(atPath: preferencesURL.path) {
                 preferences = try JSONDecoder().decode(PlayPreferences.self, from: Data(contentsOf: preferencesURL))
@@ -63,12 +66,13 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         let submenu = NSMenu(); item.submenu = submenu
         submenu.addItem(withTitle: "Quit MapleRoyals", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         NSApp.mainMenu = menu
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 500),
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 530),
                           styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
         window.title = "MapleRoyals"
         window.isReleasedWhenClosed = false
         heading.font = .systemFont(ofSize: 30, weight: .bold)
         message.font = .systemFont(ofSize: 14)
+        clientCount.textColor = .secondaryLabelColor
         selection.textColor = .secondaryLabelColor
         let subtitle = NSTextField(labelWithString: "Your game, ready to open on your Mac.")
         subtitle.textColor = .secondaryLabelColor
@@ -107,7 +111,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         progress.minValue = 0; progress.maxValue = 1
         progress.isIndeterminate = true
         progress.isHidden = true
-        let stack = NSStackView(views: [heading, subtitle, message, displayOptions, displayButtons, displayNote, selection, progress, buttons, utilities, note])
+        let stack = NSStackView(views: [heading, subtitle, message, clientCount, displayOptions, displayButtons, displayNote, selection, progress, buttons, utilities, note])
         stack.orientation = .vertical
         stack.alignment = .leading
         stack.spacing = 12
@@ -168,7 +172,8 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     func refreshControls() {
-        primary.title = needsRosetta ? "Enable Rosetta" : (installation?.ready == true ? "Play" : "Install game")
+        primary.title = needsRosetta ? "Enable Rosetta" : (installation?.ready == true ? (gameRunning ? "Open another client" : "Play") : "Install game")
+        clientCount.stringValue = clients.count == 0 ? "No game clients open" : "\(clients.count) game client\(clients.count == 1 ? "" : "s") open"
         primary.isEnabled = !busy && !preparingDisplay && !fatalStartupError && (needsRosetta || installation?.ready == true || installer != nil)
         choose.title = needsRosetta ? "Check again" : "Choose game installer…"
         choose.isEnabled = !busy && !preparingDisplay && !fatalStartupError && (needsRosetta || installation?.ready != true)
@@ -232,9 +237,10 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     func start(install: Bool) {
         guard !busy, !preparingDisplay, !needsRosetta, !fatalStartupError else { return }
         if install && installer == nil { chooseInstaller(); return }
-        busy = true
-        refreshControls()
         if install {
+            guard !gameRunning else { return }
+            busy = true
+            refreshControls()
             updateProgress("Preparing the installation…", nil)
             let selected = installer!
             worker.async {
@@ -326,22 +332,35 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
 
     func launchGame() {
-        gameRunning = true
-        preparingDisplay = false; awaitingDisplayConfirmation = false
-        updateProgress("Opening MapleRoyals…", nil)
-        refreshControls()
-        worker.async {
-            do {
-                try self.installation.play()
-                DispatchQueue.main.async { self.finishSession(nil) }
-            } catch {
-                DispatchQueue.main.async { self.finishSession(error) }
-            }
+        do {
+            let id = UUID()
+            let process = try installation.gameProcess(clientID: id)
+            let client = try clients.start(id: id, process: process)
+            installation.note("Client \(client.number) started: \(id); PID \(process.processIdentifier); \(clients.count) clients open")
+            message.stringValue = "Opening client \(client.number)… You can open another client from this launcher."
+            progress.stopAnimation(nil); progress.isHidden = true
+            refreshControls()
+        } catch {
+            if gameRunning { showError(error) }
+            else { finishSession(error) }
         }
     }
 
+    func clientFinished(_ client: GameClients.Client) {
+        let status = client.process.terminationStatus
+        installation.note("Client \(client.number) closed: \(client.id); PID \(client.process.processIdentifier); exit \(status); \(clients.count) clients remain")
+        let error: Error? = status == 0 ? nil : SetupError(message: "Client \(client.number) closed with code \(status). Click Show log for details.")
+        if gameRunning {
+            // Keep active games and any in-progress display confirmation intact.
+            if !preparingDisplay {
+                message.stringValue = error?.localizedDescription ?? "Client \(client.number) closed. Your other game clients are still running."
+            }
+            refreshControls()
+        } else { finishSession(error) }
+    }
+
     func finishSession(_ error: Error?) {
-        gameRunning = false
+        guard !gameRunning else { return }
         confirmationTimer?.invalidate(); confirmationTimer = nil
         preparingDisplay = false; awaitingDisplayConfirmation = false; pendingDisplayKey = nil
         let wasScaled = gameDisplay?.active == true
@@ -349,7 +368,7 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
         busy = false
         progress.stopAnimation(nil); progress.isHidden = true
         if let error = error { showError(error) }
-        else { message.stringValue = wasScaled && restoreFailure == nil ? "The game has closed and your normal display is restored. Apply a screen resolution if wanted, then click Play." : "The game has closed. Apply a screen resolution if wanted, then click Play." }
+        else { message.stringValue = wasScaled && restoreFailure == nil ? "All game clients have closed and your normal display is restored. Click Play to open a new client." : "All game clients have closed. Click Play to open a new client." }
         if let failure = restoreFailure { message.stringValue += " " + failure }
         window.center(); refreshControls()
     }
@@ -389,10 +408,10 @@ final class PortableLauncher: NSObject, NSApplicationDelegate {
     }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if preparingDisplay { cancelDisplayTest() }
-        if busy {
+        if busy || gameRunning {
             let alert = NSAlert()
-            alert.messageText = "Finish setup or close the game first"
-            alert.informativeText = "The launcher is still managing this session. Leave it open until the game or installer has closed."
+            alert.messageText = "Finish setup or close all game clients first"
+            alert.informativeText = "The launcher is still managing this session. Leave it open until every game client or the installer has closed."
             alert.addButton(withTitle: "Keep open")
             alert.runModal()
             window.makeKeyAndOrderFront(nil)
