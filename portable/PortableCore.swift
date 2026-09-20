@@ -30,6 +30,7 @@ final class PortableInstallation {
     var lockDescriptor: Int32 = -1
     var log: FileHandle?
     var state = InstallState()
+    var diagnosingSetup = false
     var versionRoot: URL { root.appendingPathComponent("runtimes/" + Self.runtimeID) }
     var prefix: URL { root.appendingPathComponent("prefixes/" + Self.runtimeID) }
     var engine: URL { versionRoot.appendingPathComponent("engine/wswine.bundle") }
@@ -63,7 +64,8 @@ final class PortableInstallation {
         }
         manager.createFile(atPath: logURL.path, contents: nil, attributes: [.posixPermissions: 0o600])
         log = try FileHandle(forWritingTo: logURL)
-        note("Launcher opened. Runtime: \(Self.runtimeID); macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "development"
+        note("Launcher \(version) opened. Runtime: \(Self.runtimeID); macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
         if manager.fileExists(atPath: stateFile.path) {
             state = try JSONDecoder().decode(InstallState.self, from: Data(contentsOf: stateFile))
             guard state.schema == 1, state.runtime == Self.runtimeID else {
@@ -144,9 +146,17 @@ final class PortableInstallation {
         child.standardOutput = log
         child.standardError = log
         note("Run: \(executable.lastPathComponent) \(arguments)")
+        let finished = DispatchSemaphore(value: 0)
+        child.terminationHandler = { _ in finished.signal() }
+        let started = ProcessInfo.processInfo.systemUptime
         try child.run()
-        child.waitUntilExit()
-        note("Exit: \(child.terminationStatus)")
+        note("Started PID \(child.processIdentifier)")
+        while finished.wait(timeout: .now() + 30) == .timedOut {
+            if diagnosingSetup {
+                note("Still waiting for \(executable.lastPathComponent), PID \(child.processIdentifier), \(Int(ProcessInfo.processInfo.systemUptime - started)) seconds elapsed")
+            }
+        }
+        note("Exit: \(child.terminationStatus); PID \(child.processIdentifier); elapsed \(Int(ProcessInfo.processInfo.systemUptime - started)) seconds")
         guard child.terminationStatus == 0 else {
             throw SetupError(message: "\(executable.lastPathComponent) stopped with code \(child.terminationStatus). Open the log for details. Your installation files are preserved.")
         }
@@ -201,7 +211,9 @@ final class PortableInstallation {
         values["WINESERVER"] = engine.appendingPathComponent("bin/wineserver").path
         values["DYLD_FALLBACK_LIBRARY_PATH"] = libraries.path + ":/usr/lib"
         values["WINEDLLOVERRIDES"] = "mscoree,mshtml="
-        values["WINEDEBUG"] = "-all,err+all"
+        values["WINEDEBUG"] = diagnosingSetup
+            ? "-all,err+all,+timestamp,+pid,+tid,trace+process,trace+loaddll,trace+macdrv"
+            : "-all,err+all"
         values["WINEESYNC"] = "0"
         values["WINEMSYNC"] = "1"
         values["PATH"] = engine.appendingPathComponent("bin").path + ":/usr/bin:/bin:/usr/sbin:/sbin"
@@ -216,7 +228,42 @@ final class PortableInstallation {
         try process(engine.appendingPathComponent("bin/wineserver"), ["-w"], environment: environment())
     }
 
+    func runInstaller(_ installer: URL) throws {
+        // A fixed Wine path keeps the user's filename out of the batch command.
+        // The link also avoids copying a multi-gigabyte installer into the prefix.
+        let name = "mapleroyals-setup-" + UUID().uuidString
+        let staging = prefix.appendingPathComponent("drive_c/" + name)
+        try manager.createDirectory(at: staging, withIntermediateDirectories: true)
+        defer { try? manager.removeItem(at: staging) }
+        try manager.createSymbolicLink(at: staging.appendingPathComponent("installer.exe"), withDestinationURL: installer)
+        let windowsDirectory = "C:\\" + name
+        let script = """
+        @echo off
+        "\(windowsDirectory)\\installer.exe" /DIR=C:\\MapleRoyals /NOICONS
+        >"\(windowsDirectory)\\exit-code.txt" echo %errorlevel%
+        exit
+        """
+        try Data((script.replacingOccurrences(of: "\n", with: "\r\n") + "\r\n").utf8)
+            .write(to: staging.appendingPathComponent("launch.cmd"))
+        // Explorer creates the desktop first. It does not forward the child's exit
+        // code, so the batch records it before we decide setup succeeded.
+        try wine(["explorer", "/desktop=MapleRoyalsSetup,1024x768", "C:\\windows\\system32\\cmd.exe",
+                  "/d", "/c", windowsDirectory + "\\launch.cmd"])
+        try waitForWine()
+        let statusFile = staging.appendingPathComponent("exit-code.txt")
+        let text = try? String(contentsOf: statusFile, encoding: .utf8)
+        guard let text = text, let status = Int32(text.trimmingCharacters(in: .whitespacesAndNewlines)) else {
+            throw SetupError(message: "The Windows installer did not report a result. Click Show log and send the log to the maintainer. Your game files are preserved.")
+        }
+        note("Windows installer exit code: \(status)")
+        guard status == 0 else {
+            throw SetupError(message: "The Windows installer was cancelled or failed (code \(status)). Click Show log for details. Your game files are preserved.")
+        }
+    }
+
     func install(_ installer: URL) throws {
+        report("Checking the game installer…", nil)
+        note("Selected installer: \(installer.lastPathComponent)")
         guard installer.pathExtension.lowercased() == "exe", manager.isReadableFile(atPath: installer.path) else {
             throw SetupError(message: "Choose the Windows WZ installer downloaded from the official MapleRoyals website.")
         }
@@ -225,15 +272,20 @@ final class PortableInstallation {
         let header = try input.read(upToCount: 2)
         try input.close()
         guard header == Data([0x4d, 0x5a]) else { throw SetupError(message: "That file is not a Windows installer. Download the Windows WZ installer again.") }
+        diagnosingSetup = true
+        defer { diagnosingSetup = false }
+        report("Checking game support files…", nil)
+        note("Checking Wine runtime files")
         try prepareRuntime()
         try manager.createDirectory(at: prefix, withIntermediateDirectories: true)
+        note("Setup environment: \(environment())")
         report("Preparing your game folder…", nil)
         try wine(["wineboot", "-u"])
+        report("Waiting for Windows setup to finish preparing… This can take several minutes.", nil)
         try waitForWine()
         report("Finish the MapleRoyals installer. Keep C:\\MapleRoyals and turn off ‘Launch MapleRoyals’ before Finish.", nil)
         note("User-selected installer SHA-256: \(try Self.sha256(installer))")
-        try wine([installer.path, "/DIR=C:\\MapleRoyals", "/NOICONS"])
-        try waitForWine()
+        try runInstaller(installer)
         guard manager.fileExists(atPath: game.path) else {
             throw SetupError(message: "The game was not installed at C:\\MapleRoyals. Choose the installer again to retry, keeping that destination.")
         }

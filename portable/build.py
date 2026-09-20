@@ -10,6 +10,7 @@ import tempfile
 
 SOURCE = Path(__file__).resolve().parent
 REPO = SOURCE.parent
+VERSION = '0.7.3-setup.1'
 
 
 def run(*args):
@@ -20,8 +21,8 @@ def bundle(path, executable, identifier, name, **extra):
     (path / 'Contents/MacOS').mkdir(parents=True)
     (path / 'Contents/Resources').mkdir()
     info = dict(CFBundleExecutable=executable, CFBundleIdentifier=identifier,
-                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.7.2',
-                CFBundleShortVersionString='0.7.2', LSMinimumSystemVersion='14.0',
+                CFBundleName=name, CFBundlePackageType='APPL', CFBundleVersion='0.7.3',
+                CFBundleShortVersionString=VERSION, LSMinimumSystemVersion='14.0',
                 NSHighResolutionCapable=True, **extra)
     (path / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
 
@@ -56,6 +57,7 @@ def main():
         for filename in ['DeskPad-LICENSE.md', 'NOTICE.md']:
             shutil.copy2(REPO / 'display' / filename, app / 'Contents/Resources' / filename)
         shutil.copy2(SOURCE / 'START-HERE.txt', stage / 'START-HERE.txt')
+        shutil.copy2(REPO / 'LICENSE', stage / 'LICENSE.txt')
         signing = ['--force', '--sign', args.identity or '-']
         if args.identity:
             signing += ['--options', 'runtime', '--timestamp']
@@ -63,7 +65,7 @@ def main():
             run('codesign', *signing, target)
             run('codesign', '--verify', '--strict', target)
         (stage / 'BUILD-INFO.json').write_text(json.dumps({
-            'version': '0.7.2', 'integrated_fullscreen': True, 'architecture': 'arm64', 'minimum_macos': '14.0',
+            'version': VERSION, 'integrated_fullscreen': True, 'architecture': 'arm64', 'minimum_macos': '14.0',
             'signature': 'Developer ID' if args.identity else 'ad-hoc',
             'notarized': False, 'contains_game_or_wine_binaries': False,
             'recipient_needs_python_or_command_line_tools': False,

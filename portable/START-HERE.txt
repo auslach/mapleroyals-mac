@@ -1,4 +1,15 @@
-MAPLEROYALS FOR MAC — EXPERIMENTAL PREVIEW 0.7.2
+MAPLEROYALS FOR MAC — SETUP TEST 0.7.3-setup.1
+
+RETRYING A FAILED SETUP
+This test build starts the Windows desktop before opening the game installer
+and adds detailed setup logging. A fix on the affected Mac is not yet confirmed.
+Quit the old launcher and restart your Mac once to clear any stuck Wine processes.
+Replace the old MapleRoyals.app with this one, choose the same WZ installer,
+and click Install game. Keep your existing MapleRoyalsLauncher data folder.
+Do not change screen resolution during this setup test.
+If it fails or no installer window appears after several minutes, click Show log
+and send launcher.log privately to the maintainer. It may contain your Mac user
+name and local file paths. Detailed logging applies to setup, not normal play.
 
 ONE APP FOR THE GAME AND FULLSCREEN
 Open MapleRoyals.app. Fullscreen controls are inside the launcher; no separate

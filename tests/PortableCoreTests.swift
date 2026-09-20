@@ -27,6 +27,12 @@ struct PortableCoreTests {
         try require(core.environment()["WINEARCH"] == "win64", "WoW64 prefix must be win64")
         try require(core.environment()["DXVK_HUD"] == nil, "Do not inherit renderer overrides")
         try require(core.environment()["DYLD_LIBRARY_PATH"] == nil, "Do not inherit another runtime's libraries")
+        core.diagnosingSetup = true
+        try require(core.environment()["WINEDEBUG"]?.contains("trace+macdrv") == true, "Setup must record window initialization")
+        core.diagnosingSetup = false
+        try require(core.environment()["WINEDEBUG"] == "-all,err+all", "Normal play must not use verbose setup logging")
+        try core.process(URL(fileURLWithPath: "/usr/bin/true"), [])
+        try rejects({ try core.process(URL(fileURLWithPath: "/usr/bin/false"), []) }, "Child failures must propagate after process tracking")
         let payload = temporary.appendingPathComponent("payload")
         try Data("abc".utf8).write(to: payload)
         let checksum = try PortableInstallation.sha256(payload)

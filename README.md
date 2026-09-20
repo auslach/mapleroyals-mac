@@ -4,6 +4,8 @@ Run the Windows MapleRoyals client through a small native Mac launcher, without 
 
 ## Download and play
 
+**Setup stuck before the Windows installer opens?** Try the **[0.7.3-setup.1 test release](https://github.com/auslach/mapleroyals-mac/releases/tag/v0.7.3-setup.1)** and download `MapleRoyals-Mac-Setup-Test.zip` from its Assets section. This test changes installer startup order and adds detailed setup logging. It opened the installer on the development Mac; resolving the reported failure on another Mac remains unconfirmed. Follow the retry instructions on the release page.
+
 **[Download MapleRoyals-Mac.zip for Apple Silicon Macs](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip)**
 
 1. Download the app ZIP above, then double-click it to unpack it.
@@ -11,8 +13,6 @@ Run the Windows MapleRoyals client through a small native Mac launcher, without 
 3. Follow the **[player setup instructions](docs/PLAYER_GUIDE.md)** to download the official Windows WZ game installer and complete first-time setup.
 
 **Already cloned this repository?** Open **[download/MapleRoyals-Mac.zip](download/MapleRoyals-Mac.zip)** in your local repository folder. It is the same ready-built app; no build commands are needed. If you used GitHub's **Code → Download ZIP**, unpack that repository archive first, then open the app ZIP inside its **download** folder.
-
-This repository is currently private. Sign in to GitHub with an account that has access to use the download link.
 
 ## Choose your guide
 
