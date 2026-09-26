@@ -17,9 +17,25 @@ Run the Windows MapleRoyals client through a small native Mac launcher, without 
 - **[Player guide: install and play](docs/PLAYER_GUIDE.md)** — get the right ZIP, complete first-time setup, launch the game, use fullscreen, and restore your normal Mac display. Written for people who just want to play.
 - **[Developer guide: build and extend the project](docs/DEVELOPER_GUIDE.md)** — prerequisites, building a shareable ZIP, source layout, runtime configuration, development checks, and the older Terminal setup route.
 
+## Launcher sections (upcoming 0.3.0)
+
+The next version groups one page under three headings: **Play** (launching and client cards), **Resolution** (screen size, refresh rate and restoring the display), and **Settings** (setup, installing downloaded updates, logs and game files). All three groups are visible together, with scrolling on small screens. Opening the app does not launch a game or change the display. The linked 0.2.0 release uses the earlier layout.
+
 ## Multiple clients
 
 Click **Play** for the first game, then **Open another client** for each additional game window. The launcher has no client-count cap. Closing one client leaves the others running, and the normal Mac display returns after the last client closes. [Multiclient instructions](docs/PLAYER_GUIDE.md#opening-more-than-one-client)
+
+The next launcher version, **0.3.0**, also shows a small numbered card for each open client. Cards appear and disappear as clients open and close. They do not take screenshots or need Screen Recording permission.
+
+## Character-loading compatibility fix (upcoming 0.3.0)
+
+The source now includes an automatic Wine networking compatibility fix for a reproduced character-loading crash on Macs with many network interfaces. It installs into Wine's system directory when **Play** is pressed, preserves the game files, and needs no manual DLL settings. The user confirmed gameplay with the isolated fix on an M1 Pro running macOS 27. The combined launcher build still needs gameplay validation; the linked **0.2.0 ZIP does not include this fix**. [Technical details](compat/README.md)
+
+## Game updates
+
+The next launcher version, **0.3.0**, adds **Settings → Install downloaded update…**. Download the latest Windows WZ installer yourself from the official website, choose that file in the launcher, and click **Run selected installer**. The launcher does not check for updates or download game files automatically. Wine is reused and the previous installation is kept as a backup. The linked 0.2.0 release does not contain this feature. [Game update instructions](docs/PLAYER_GUIDE.md#updating-the-game-files-launcher-030)
+
+The new WZ installer dated September 21, 2026 completed this update flow on the M1 Pro running macOS 27.0, and the user confirmed character loading and gameplay afterward.
 
 ## Fullscreen
 
@@ -43,7 +59,7 @@ If setup previously failed before the Windows installer appeared, version 0.2.0 
 
 This is an **experimental, unofficial project**. On an M1 Pro MacBook Pro running macOS 26.5.2, the July 2, 2026 WZ client passed fresh installation, character loading on retry, map changes, normal shutdown, and reopening with another successful character load. The installer startup fix included in 0.1.0 was confirmed on a second M1 Pro running macOS 27.0. [Earlier ZIP test results](docs/ZIP_ACCEPTANCE.md)
 
-With 0.2.0 on the original M1 Pro running macOS 27.0, the user confirmed two accounts logged in simultaneously after retrying the second client. Intermittent login/character-loading failures remain unexplained; if one client closes, **Open another client** lets you retry while the other stays open. More than two simultaneous game clients, missing-Rosetta setup and long sessions remain unverified.
+With 0.2.0 on the original M1 Pro running macOS 27.0, the user confirmed two accounts logged in simultaneously after retrying the second client. A later repeatable character-loading failure was traced to a network-adapter buffer error and addressed by the upcoming fix above; this does not explain every possible login failure. If one client closes, **Open another client** lets you retry while the other stays open. More than two simultaneous game clients, missing-Rosetta setup and long sessions remain unverified.
 
 **800×600 was smoother and playable; 1024×768 still had noticeable visual lag.** Fullscreen scaling enlarges the picture but does not resolve that performance difference.
 

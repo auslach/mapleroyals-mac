@@ -1,4 +1,4 @@
-MAPLEROYALS FOR MAC — VERSION 0.2.0
+MAPLEROYALS FOR MAC — VERSION 0.3.0
 
 RETRYING A FAILED SETUP
 The launcher starts the Windows desktop before opening the game installer
@@ -14,16 +14,20 @@ name and local file paths. Detailed logging applies to setup, not normal play.
 
 ONE APP FOR THE GAME AND FULLSCREEN
 Open MapleRoyals.app. Fullscreen controls are inside the launcher; no separate
-display helper is needed. Players do not need Terminal, Python, developer tools,
+display helper is needed. The controls share one page under three headings:
+- Play: launch games and see open client cards.
+- Resolution: apply a screen size/rate or restore your normal display.
+- Settings: install downloaded game files, view logs and find game files.
+Players do not need Terminal, Python, developer tools,
 Homebrew, CrossOver or Sikarugir.
 
 FIRST-TIME SETUP
 1. Move MapleRoyals.app somewhere you intend to keep it, such as Applications.
 2. Download the official Windows WZ installer from https://royals.ms/downloads.
    Leave it as an .exe. You do not need IMG for this setup.
-3. Open the app. If it asks for Rosetta, click Enable Rosetta, complete Apple's
+3. Open the app. First-time setup is under Settings. If it asks for Rosetta, click Enable Rosetta, complete Apple's
    prompt yourself, then return and click Check again.
-4. Click Choose game installer, select the WZ .exe, then Install game.
+4. Click Choose WZ installer, select the WZ .exe, then Install game.
    Leave the app open while it downloads about 260 MB of support files.
 5. Complete the Windows installer at C:\MapleRoyals, including Visual C++ prompts.
    Turn OFF Launch MapleRoyals in the installer before clicking Finish.
@@ -35,18 +39,40 @@ was also confirmed on a second M1 Pro running macOS 27.0.
 
 ALREADY INSTALLED?
 Close the game and quit the old launcher. Restore and quit any old fullscreen
-helper too. Replace MapleRoyals.app with this version. Open it, choose your
-display size, click Change screen resolution if wanted, then Play. Your game
+helper too. Replace MapleRoyals.app with this version. Open it, use Resolution to choose your
+screen size and click Change screen resolution if wanted, then return to Play. Your game
 installation stays in place. Do not delete the data folder or reinstall the game.
 
+UPDATING THE GAME FILES
+When MapleRoyals requires a new full installer:
+1. Close every game window, under Settings, click Install downloaded update.
+2. If you have not downloaded the installer yet, click Open download page.
+   In your browser, download the latest Windows WZ .exe from the official
+   MapleRoyals website. Leave it as an .exe file.
+3. Return to the launcher, click Choose WZ installer, and select the new file.
+4. Click Run selected installer. Allow about 10 GB free for staging and a backup.
+5. Finish the Windows installer at C:\MapleRoyals. Turn OFF Launch MapleRoyals
+   before Finish. If a game opens, close it so the update can finish.
+6. Wait for Game files installed, then click Play. The game will not auto-start.
+
+Wine and launcher display preferences are reused. New game files are installed
+separately before replacing the current installation. Back to launcher backs out
+before starting; once the installer opens, cancel using its own Cancel button.
+If installation fails, the previous installation is kept. An older client may
+not connect to the updated server, so retry with the latest WZ installer.
+Backups are in Settings > Game files > backups; incomplete attempts can remain in updates.
+They use extra space and are not automatically deleted. Keep a backup until the
+updated game works. No automatic version checking or installer downloading is
+provided. After force-quitting during an update, restart the Mac before retrying.
+
 PLAYING AND FULLSCREEN
-1. Open MapleRoyals.app. It selects 800x600 but does not change the screen or
-   start the game. There is no automatic launch.
-2. For fullscreen, choose 800x600 or 1024x768 and 60 Hz or 120 Hz, then click
+1. Open MapleRoyals.app. All three groups are shown together. Resolution defaults
+   to 800x600; opening the app does not change the screen or start the game.
+2. For fullscreen, under Resolution choose 800x600 or 1024x768 and a rate, then click
    Change screen resolution. Use 120 Hz only with a compatible display.
 3. A new display mode asks you to Keep resolution within 20 seconds. Cancel or
    wait to restore the screen. Keeping the resolution does NOT start the game.
-4. Click Play to start the game. You can skip steps 2–3 to keep your normal
+4. Click Play in the Play section. Skip steps 2–3 to keep your normal
    Mac display. Play itself does not change the Mac screen resolution.
 5. In the game, select the matching resolution. Use Option+Return if needed
    to hide its window borders. Use 800x600 in the game with the 800x600 display.
@@ -59,7 +85,9 @@ Click it again for each additional game window; the launcher has no client limit
 Sign into a different account in each game window. Use the same launcher for
 all clients, rather than opening extra copies of MapleRoyals.app.
 The launcher shows how many clients are open. Closing one leaves the others
-running. Close every game client before quitting the launcher. All clients
+running. A numbered card also appears for each open client; scroll down if
+needed. Cards have no screenshots and need no Screen Recording permission.
+Close every game client before quitting the launcher. All clients
 share the installed files, game settings, and Mac fullscreen display.
 Each additional client uses more memory and graphics resources.
 Two accounts were tested together on an M1 Pro running macOS 27.0, after retrying
@@ -67,7 +95,7 @@ the second client. If a client closes during login, click Open another client
 to retry while leaving any working client open. This intermittent failure is
 unresolved. More than two simultaneous game clients have not been tested.
 
-You can change size/rate while playing: choose the settings and click Change
+You can change size/rate while playing: under Resolution choose the size/rate and click Change
 screen resolution. This keeps the same game session; no restart is needed.
 Set the game's own resolution separately to match.
 
@@ -99,6 +127,6 @@ https://github.com/auslach/mapleroyals-mac/blob/main/docs/PLAYER_GUIDE.md
 Your game data stays at ~/Library/Application Support/MapleRoyalsLauncher.
 The app ZIP contains no game assets, Wine runtime, used prefix or account data.
 The app downloads its Wine runtime; get the official game separately.
-Use Show log for errors. Review logs for private details before sharing. Never
+Use Settings > Show log for errors. Review logs for private details before sharing. Never
 share passwords or PIC. Forced-quit recovery and long-session
 reliability remain unverified.

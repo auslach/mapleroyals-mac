@@ -4,6 +4,8 @@ This repository contains the native launcher, local provisioning scripts, docume
 
 ## Included material
 
+`compat/adapter_compat.c` and its generated compatibility DLL are project code under the repository's MIT License. The portable builder includes this small DLL and its license. It does not bundle Wine's implementation: the launcher creates a renamed copy of the separately downloaded, checksum-pinned Wine library on the player's Mac. The copy changes one DOS-stub marker byte; Wine's existing license and corresponding-source terms remain applicable. See [the component's build and provisioning notes](compat/README.md).
+
 The private CoreGraphics declarations in `display/CGVirtualDisplayPrivate.h` were taken from the MIT-licensed DeskPad project at inspected commit `c3349f0e237e000cb4826fb3ea1cdd1c44949461`. Keep [its full license](display/DeskPad-LICENSE.md) and [provenance notice](display/NOTICE.md) with this material. The combined launcher and standalone display-helper builds copy those notices into their generated apps.
 
 ## Downloaded on the user's Mac

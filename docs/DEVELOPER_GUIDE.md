@@ -6,7 +6,7 @@ Use this guide to build the shareable app ZIP, work on the native launcher, or r
 
 ## Build prerequisites
 
-Use an Apple Silicon Mac with macOS 14 or newer, Python 3.9 or newer, and Apple's Command Line Tools with Swift. Builds and gameplay have been exercised on an M1 Pro running macOS 26.5.2. The app targets macOS 14–27; other supported-target combinations remain unvalidated.
+Use an Apple Silicon Mac with macOS 14 or newer, Python 3.9 or newer, Apple's Command Line Tools with Swift, and Zig 0.16.0 for the small Windows compatibility DLL. Builds and gameplay have been exercised on an M1 Pro running macOS 26.5.2. The app targets macOS 14–27; other supported-target combinations remain unvalidated.
 
 Install/check the build tools as needed:
 
@@ -17,6 +17,8 @@ xcrun --find swiftc
 ```
 
 Complete Apple's installer if the tools are missing. Full Xcode and Homebrew are not required. Install Python from [Python.org](https://www.python.org/downloads/macos/) if your available version is too old. No third-party Python packages are required.
+
+Download and unpack the official [Zig 0.16.0 archive](https://ziglang.org/download/). Keep its `lib` folder beside `zig`. Pass `--zig /path/to/zig` to the builder below, or put that executable on `PATH` / set `ZIG`. The builder pins the compiler version and compiles the compatibility source; it never downloads a community DLL. See [compatibility build details](../compat/README.md). Players still need no developer tools.
 
 Rosetta is required to **run Wine and test the game** on Apple Silicon, not to compile the native arm64 launcher. If it is absent, test the app's Rosetta flow or install it through Apple's prompt:
 
@@ -31,16 +33,16 @@ Clone this repository (with access to it), or unpack its source ZIP. Run the com
 ## Build the shareable app ZIP
 
 ```sh
-python3 portable/build.py
+python3 portable/build.py --zig /path/to/zig
 ```
 
 The default outputs are `dist/MapleRoyals-preview/` and `dist/MapleRoyals-preview.zip`. Existing outputs are never overwritten. For another build, choose a new output folder, for example:
 
 ```sh
-python3 portable/build.py --output dist/MapleRoyals-preview-next
+python3 portable/build.py --zig /path/to/zig --output dist/MapleRoyals-preview-next
 ```
 
-The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatibility helper, integrated fullscreen controls, `START-HERE.txt`, configuration, notices and build information. The recipient downloads the official game separately; on first run the app downloads about 260 MB of pinned runtime archives and initializes its own Wine prefix.
+The ZIP includes the native arm64 `MapleRoyals.app`, its embedded Intel compatibility helper, integrated fullscreen controls, the project-owned adapter compatibility DLL, `START-HERE.txt`, configuration, notices and build information. The recipient downloads the official game separately; on first run the app downloads about 260 MB of pinned runtime archives and initializes its own Wine prefix.
 
 **The ready-to-run player download is tracked at [`download/MapleRoyals-Mac.zip`](../download/MapleRoyals-Mac.zip).** A clone and GitHub's Code → Download ZIP both include this app archive. The README also links directly to its download. Players do not build the app.
 
@@ -55,6 +57,9 @@ The default build uses ad-hoc signatures and no Apple Developer account, Team Id
 | [`portable/PortableLauncher.swift`](../portable/PortableLauncher.swift) | Native AppKit UI, installer selection, Rosetta flow, status and Play controls. |
 | [`portable/GameDisplay.swift`](../portable/GameDisplay.swift) | Saved play options, virtual display creation, mirroring, restoration and cancellation of pending display callbacks. |
 | [`portable/GameClients.swift`](../portable/GameClients.swift) | Concurrent client processes, independent completion callbacks and active-client count on the main thread. |
+| [`portable/GameUpdate.swift`](../portable/GameUpdate.swift) | Separate update prefix, clean game folder, previous-prefix backup, activation journal and interrupted-swap recovery. |
+| [`portable/AdapterCompatibility.swift`](../portable/AdapterCompatibility.swift) | Verify and provision the adapter workaround inside Wine, retaining unrelated files. |
+| [`compat/`](../compat/README.md) | MIT-licensed adapter shim source, pinned export list, compiler recipe and ABI-test instructions. |
 | [`portable/PortableCore.swift`](../portable/PortableCore.swift) | Verified downloads, staged runtime extraction, exclusive installation lock, prefix setup, process launch, install marker and logs. |
 | [`portable/RosettaCheck.swift`](../portable/RosettaCheck.swift) | Tiny Intel-only helper that can trigger Apple's Rosetta installation prompt. |
 | [`portable/build.py`](../portable/build.py) | Compile, sign and package the combined app and embedded Rosetta helper. |
@@ -86,10 +91,11 @@ The portable app can move without relocating its data. It does not import the ol
 The tested configuration is `WS12WineCX24.0.7_5` plus Template 1.0.15 native libraries under Rosetta, using a `win64` WoW64 prefix for the 32-bit Windows client. It keeps the game executable unchanged.
 
 - Windows 7; builtin Direct3D 8 → WineD3D → OpenGL; Direct3D `renderer=gl` and `csmt` DWORD 0.
-- `WINEARCH=win64`, `WINEMSYNC=1`, `WINEESYNC=0`, `WINEDEBUG=-all,err+all`, `WINEDLLOVERRIDES=mscoree,mshtml=`.
+- `WINEARCH=win64`, `WINEMSYNC=1`, `WINEESYNC=0`, `WINEDEBUG=-all,err+all`, game-only `WINEDLLOVERRIDES=mscoree,mshtml=;iphlpapi=n,b;royals_iphlpapi_wine=n`. Setup retains `mscoree,mshtml=`.
 - Explicit per-user `WINEPREFIX`, matching `WINESERVER`, runtime `PATH`, and template Frameworks plus `/usr/lib` in `DYLD_FALLBACK_LIBRARY_PATH`.
 - Wine desktop registry set to 1024×768; this does not establish the game's actual viewport or the physical display resolution.
-- No custom `iphlpapi.dll`, DXVK, D9VK or D3DMetal activated.
+- Source 0.3.0 provisions the project adapter shim in the prefix’s `windows/syswow64` directory before Play. The stock Wine engine stays unchanged. See [implementation and validation scope](../compat/README.md).
+- No DXVK, D9VK or D3DMetal activated.
 
 The launch command is passed as a process argument array, with the installed game directory as the working directory:
 
@@ -107,25 +113,37 @@ The original [configuration reference](CONFIGURATION.md) documents the older rou
 
 ## Development checks
 
+The 0.3.0 launcher adds `ClientCards.swift`, an AppKit view driven by the existing main-thread `GameClients` entries. It sorts cards by launch number, removes them on process completion, and leaves surviving numbers unchanged. A scrollable, resizable launcher accommodates additional rows and small display modes. Cards do not inspect game windows or capture screen content; no capture framework, permission request, polling timer, or additional Wine environment variable is used. An open card represents the tracked Explorer process, not proof of successful login.
+
 Run the core regression checks without downloading or executing the game:
 
 ```sh
-mkdir -p build
-xcrun swiftc -swift-version 5 -O -target arm64-apple-macos14.0 -module-cache-path build/module-cache \
-  portable/PortableCore.swift tests/PortableCoreTests.swift -o build/portable-core-tests
-build/portable-core-tests .
-xcrun swiftc -swift-version 5 -O -target arm64-apple-macos14.0 -module-cache-path build/module-cache \
-  portable/PortableCore.swift portable/GameClients.swift tests/GameClientsTests.swift -o build/game-clients-tests
-build/game-clients-tests
+python3 tests/run.py
 ```
 
-The checks cover tampered downloads, wrong installer input before download, exclusive ownership, portable paths, environment isolation, and preservation of existing runtime data. Client checks launch real lightweight processes and exercise simultaneous clients, independent exits, a failed spawn while another client runs, more than two clients, and immediate process exit. The ZIP builder also verifies its generated app signatures. These checks do not establish game compatibility.
+The checks cover tampered downloads, wrong installer input before download, exclusive ownership, portable paths, environment isolation, preservation of existing runtime data, and adapter provisioning/recovery without changing live-client DLLs. Client checks launch real lightweight processes and exercise simultaneous clients, independent exits, a failed spawn while another client runs, more than two clients, and immediate process exit. The ZIP builder also verifies its generated app signatures. These checks do not establish game compatibility.
 
 For runtime or launch changes, test progressively: executable start, login, world/channel, character/PIC if prompted, game entry, map changes, keyboard/mouse, windowed resolution, normal exit and cold relaunch. Inspect logs at the failing stage. Verify the actual loaded runtime and graphics path instead of inferring it from setup-time GPU enumeration. Only add concurrent-client support after explicit gameplay testing.
 
 Preserve a working installation before a runtime/prefix migration. Do not silently reuse it as evidence of a clean setup. The current [ZIP acceptance record](ZIP_ACCEPTANCE.md) identifies the exact tested artifact and separates user-observed gameplay from process/log verification. [Source-export validation](VALIDATION.md) and [research history](RESEARCH.md) preserve the earlier checks and failed renderer experiments.
 
-Known limits include one unexplained initial character-loading failure, poorer 1024×768 performance, and untested second-Mac/Rosetta/Gatekeeper flows. Missing-Rosetta, external displays, sleep/wake and long-session reliability need further testing. No production notarization is claimed.
+A later repeated character-loading crash was traced to the game ignoring an insufficient adapter-buffer result; the isolated adapter workaround passed user gameplay validation. This does not establish the cause of every earlier intermittent failure. The combined 0.3.0 launcher still needs gameplay validation. Other limits include poorer 1024×768 performance and untested missing-Rosetta/Gatekeeper flows. Missing-Rosetta, external displays, sleep/wake and long-session reliability need further testing. No production notarization is claimed.
+
+## Game installer updates
+
+The 0.3.0 source adds a guided **Install downloaded update…** mode. The player downloads an official WZ installer manually; **Open download page** opens the official website, and **Run selected installer** starts the chosen file. No version feed, scraping or game redistribution is introduced. Selecting an installer is separate from starting it. The main-thread UI blocks updates while clients are tracked and blocks all new clients while an update runs.
+
+The launcher places Play, Resolution and Settings panels together on one scrollable page with headings and dividers. Play launches clients, Resolution owns display controls, and Settings owns installer actions and support files. Missing setup or Rosetta is handled under Settings; Set up game scrolls to that group. Only the applicable Play or installer action receives the Return shortcut. Existing busy and display-confirmation guards remain in force.
+
+The focused update form remains inside Settings, hiding Play, Resolution and unrelated Settings controls until Back to launcher or successful installation. Success restores the full page without starting a game. An error exposes Show log in Settings while retaining the chosen installer for retry. Separate Play and installer actions share the existing guarded start method; the runtime and update transaction are unchanged.
+
+`updateGame` validates the selected executable and existing runtime, waits for the active prefix's Wine processes to exit, then copies the prefix into `updates/<UUID>/prefix`. `GameUpdate.prepare` removes only the copied `drive_c/MapleRoyals` folder so stale WZ/DLL files cannot survive in the replacement. Registry files and symlinks are preserved. The unchanged desktop-first installer command runs with the staged WINEPREFIX and the same shared runtime. Its explicit result file must report zero, all staged Wine processes must exit, and the staged game must contain a Windows executable and WZ files before activation. These file checks do not prove gameplay compatibility or installer authenticity.
+
+The active prefix stays in place throughout installation. Activation writes `game-update.json`, moves the old prefix to `backups/<UUID>/prefix`, moves the staged prefix to the normal path, then marks the transaction committed. At launcher startup, the journal rolls back an uncommitted swap or retains a committed update. Failed rollback blocks launch until recovery succeeds. Backups and failed staging directories are retained; no automatic pruning or user-facing downgrade is implemented. After a force-quit during the installer stage, reboot before retrying, because a Windows child installer may still be running in the separate prefix.
+
+The installed marker and `play-preferences.json` are outside the prefix and are not reset. Updates do not re-import first-install registry defaults. Files added directly inside the previous game folder remain in its backup rather than being mixed into the fresh game. Successful installer completion returns the UI to Ready; it does not launch MapleRoyals. Cancelling the native file picker changes nothing; cancelling the Windows installer leaves the active prefix unchanged.
+
+`GameUpdateTests` exercises actual filesystem swaps, interrupted-swap recovery at each boundary, preservation of registry/display settings, and the production update method with a stand-in installer that succeeds or cancels after writing partial files. A live update with `MapleRoyalsSetupWz-21.09.26.exe` completed on the M1 Pro running macOS 27.0, retained the previous prefix as a backup, and returned to Play. The user confirmed loading a character and playing the updated game. This validates that installer/update combination, not arbitrary future installers.
 
 ## Integrated fullscreen lifecycle
 
@@ -173,7 +191,7 @@ An error about missing `setup.py` means the command was run outside the reposito
 
 ## Distribution boundaries
 
-Keep game assets, used prefixes, personal logs and downloaded Wine/template archives out of Git. `.gitignore` excludes them and ordinary build outputs. Its single ZIP exception is `/download/MapleRoyals-Mac.zip`, the intentionally published native launcher/helper package; do not broaden that exception or force-add other binaries. Each player obtains the official game separately. No permission to redistribute MapleRoyals/Nexon assets was established.
+Keep game assets, used prefixes, personal logs and downloaded Wine/template archives out of Git. Compatibility source and tests belong in Git; its DLL is generated during the app build. The renamed Wine dependency is generated only on the player’s Mac from the pinned runtime. `.gitignore` excludes them and ordinary build outputs. Its single ZIP exception is `/download/MapleRoyals-Mac.zip`, the intentionally published native launcher/helper package; do not broaden that exception or force-add other binaries. Each player obtains the official game separately. No permission to redistribute MapleRoyals/Nexon assets was established.
 
 The current ZIP provisions runtime archives from upstream instead of bundling them. Before redistributing Wine or template components, audit each component's license and exact corresponding source; the entire Sikarugir template must not be assumed to have one license. See [third-party notices](../THIRD_PARTY_NOTICES.md) and [packaging notes](PACKAGING.md).
 

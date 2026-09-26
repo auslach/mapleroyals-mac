@@ -6,11 +6,12 @@ from pathlib import Path
 import plistlib
 import shutil
 import subprocess
+import sys
 import tempfile
 
 SOURCE = Path(__file__).resolve().parent
 REPO = SOURCE.parent
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 
 
 def run(*args):
@@ -31,9 +32,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=REPO / 'dist/MapleRoyals-preview')
     parser.add_argument('--identity', help='Exact Developer ID Application identity; omit for local ad-hoc preview')
+    parser.add_argument('--zig', help='Path to Zig 0.16.0 for building the adapter compatibility DLL')
     args = parser.parse_args()
     output = args.output.expanduser().resolve()
-    archive = output.with_suffix('.zip')
+    archive = output.with_name(output.name + '.zip')
     if output.exists() or archive.exists():
         parser.error('Output or ZIP already exists. Choose a new path; existing builds are not overwritten.')
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -43,10 +45,15 @@ def main():
         stage.mkdir()
         app = stage / 'MapleRoyals.app'
         bundle(app, 'MapleRoyals', 'local.mapleroyals.portable', 'MapleRoyals')
+        compatibility_command = [sys.executable, REPO / 'compat/build.py', '--output', app / 'Contents/Resources/adapter-compat']
+        if args.zig:
+            compatibility_command += ['--zig', args.zig]
+        run(*compatibility_command)
         cache = temporary / 'module-cache'
         run('xcrun', 'swiftc', '-swift-version', '5', '-O', '-target', 'arm64-apple-macos14.0',
             '-module-cache-path', cache, '-import-objc-header', REPO / 'display/CGVirtualDisplayPrivate.h',
-            SOURCE / 'PortableCore.swift', SOURCE / 'GameClients.swift', SOURCE / 'GameDisplay.swift', SOURCE / 'PortableLauncher.swift',
+            SOURCE / 'PortableCore.swift', SOURCE / 'AdapterCompatibility.swift', SOURCE / 'GameUpdate.swift', SOURCE / 'GameClients.swift',
+            SOURCE / 'ClientCards.swift', SOURCE / 'GameDisplay.swift', SOURCE / 'PortableLauncher.swift',
             '-o', app / 'Contents/MacOS/MapleRoyals')
         helper = app / 'Contents/Helpers/Intel Compatibility.app'
         bundle(helper, 'IntelCompatibility', 'local.mapleroyals.intel-compatibility', 'Intel Compatibility', LSUIElement=True)
@@ -58,6 +65,7 @@ def main():
             shutil.copy2(REPO / 'display' / filename, app / 'Contents/Resources' / filename)
         shutil.copy2(SOURCE / 'START-HERE.txt', stage / 'START-HERE.txt')
         shutil.copy2(REPO / 'LICENSE', stage / 'LICENSE.txt')
+        shutil.copy2(REPO / 'LICENSE', app / 'Contents/Resources/adapter-compat/LICENSE.txt')
         signing = ['--force', '--sign', args.identity or '-']
         if args.identity:
             signing += ['--options', 'runtime', '--timestamp']
@@ -68,6 +76,7 @@ def main():
             'version': VERSION, 'integrated_fullscreen': True, 'architecture': 'arm64', 'minimum_macos': '14.0',
             'signature': 'Developer ID' if args.identity else 'ad-hoc',
             'notarized': False, 'contains_game_or_wine_binaries': False,
+            'contains_project_adapter_compatibility_dll': True,
             'recipient_needs_python_or_command_line_tools': False,
         }, indent=2) + '\n')
         stage.rename(output)

@@ -25,6 +25,7 @@ final class PortableInstallation {
     static let runtimeID = "cx24-0.7_5-template-1.0.15"
     let root: URL
     let resources: URL
+    private let alternatePrefix: URL?
     let manager = FileManager.default
     let report: (String, Double?) -> Void
     var lockDescriptor: Int32 = -1
@@ -32,16 +33,18 @@ final class PortableInstallation {
     var state = InstallState()
     var diagnosingSetup = false
     var versionRoot: URL { root.appendingPathComponent("runtimes/" + Self.runtimeID) }
-    var prefix: URL { root.appendingPathComponent("prefixes/" + Self.runtimeID) }
+    var prefix: URL { alternatePrefix ?? root.appendingPathComponent("prefixes/" + Self.runtimeID) }
     var engine: URL { versionRoot.appendingPathComponent("engine/wswine.bundle") }
     var libraries: URL { versionRoot.appendingPathComponent("template/Template-1.0.15.app/Contents/Frameworks") }
     var game: URL { prefix.appendingPathComponent("drive_c/MapleRoyals/MapleRoyals.exe") }
     var stateFile: URL { root.appendingPathComponent("installation.json") }
     var logURL: URL { root.appendingPathComponent("logs/launcher.log") }
+    var requiresUpdateRecovery: Bool { manager.fileExists(atPath: root.appendingPathComponent("game-update.json").path) }
 
-    init(root: URL, resources: URL, report: @escaping (String, Double?) -> Void) {
+    init(root: URL, resources: URL, alternatePrefix: URL? = nil, report: @escaping (String, Double?) -> Void) {
         self.root = root
         self.resources = resources
+        self.alternatePrefix = alternatePrefix
         self.report = report
     }
 
@@ -66,6 +69,9 @@ final class PortableInstallation {
         log = try FileHandle(forWritingTo: logURL)
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "development"
         note("Launcher \(version) opened. Runtime: \(Self.runtimeID); macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
+        if try GameUpdate.recover(root: root, active: prefix) {
+            note("Recovered an interrupted game update")
+        }
         if manager.fileExists(atPath: stateFile.path) {
             state = try JSONDecoder().decode(InstallState.self, from: Data(contentsOf: stateFile))
             guard state.schema == 1, state.runtime == Self.runtimeID else {
@@ -75,7 +81,7 @@ final class PortableInstallation {
     }
 
     var ready: Bool {
-        state.installed && manager.fileExists(atPath: game.path)
+        !requiresUpdateRecovery && state.installed && manager.fileExists(atPath: game.path)
             && manager.isExecutableFile(atPath: engine.appendingPathComponent("bin/wine").path)
             && manager.fileExists(atPath: libraries.path)
     }
@@ -261,7 +267,7 @@ final class PortableInstallation {
         }
     }
 
-    func install(_ installer: URL) throws {
+    func validateInstaller(_ installer: URL) throws {
         report("Checking the game installer…", nil)
         note("Selected installer: \(installer.lastPathComponent)")
         guard installer.pathExtension.lowercased() == "exe", manager.isReadableFile(atPath: installer.path) else {
@@ -272,6 +278,13 @@ final class PortableInstallation {
         let header = try input.read(upToCount: 2)
         try input.close()
         guard header == Data([0x4d, 0x5a]) else { throw SetupError(message: "That file is not a Windows installer. Download the Windows WZ installer again.") }
+        if installer.lastPathComponent.lowercased().contains("setupimg") {
+            throw SetupError(message: "Choose the Windows WZ installer, not the IMG installer, for this launcher.")
+        }
+    }
+
+    func install(_ installer: URL) throws {
+        try validateInstaller(installer)
         diagnosingSetup = true
         defer { diagnosingSetup = false }
         report("Checking game support files…", nil)
@@ -298,18 +311,55 @@ final class PortableInstallation {
         note("Installation complete")
     }
 
+    func updateGame(_ installer: URL) throws {
+        guard ready else { throw SetupError(message: "Complete the game installation before updating it.") }
+        try validateInstaller(installer)
+        try prepareRuntime()
+        // The UI prevents new clients during this operation. Wait for any Wine
+        // children to exit before copying registry files or moving the prefix.
+        report("Waiting for the game to finish closing…", nil)
+        try waitForWine()
+        let update = GameUpdate(root: root, active: prefix)
+        report("Preparing a separate copy for the update… Your current installation is kept.", nil)
+        try update.prepare()
+        let staged = PortableInstallation(root: root, resources: resources, alternatePrefix: update.staged, report: report)
+        if let log = log {
+            let descriptor = dup(log.fileDescriptor)
+            guard descriptor >= 0 else { throw SetupError(message: "Could not open the update log. Your current installation is unchanged.") }
+            staged.log = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
+        }
+        staged.diagnosingSetup = true
+        staged.note("Game update staging prefix: \(update.staged.path)")
+        staged.note("User-selected update installer SHA-256: \(try Self.sha256(installer))")
+        do {
+            report("Finish the update installer. Keep C:\\MapleRoyals and turn off ‘Launch MapleRoyals’ before Finish.", nil)
+            try staged.runInstaller(installer)
+            try GameUpdate.validateGame(in: update.staged)
+            report("Activating the updated game…", nil)
+            try update.activate()
+            note("Game update complete. Previous installation backup: \(update.backup.path)")
+        } catch {
+            note("Game update failed: \(error.localizedDescription). Staged files: \(update.directory.path)")
+            throw SetupError(message: "Update did not finish. \(error.localizedDescription) Your previous installation is kept; click Show log if you need help.")
+        }
+    }
+
     static func gameArguments(clientID: UUID) -> [String] {
         // Reusing a desktop can hand off to an existing Explorer and return early.
         // A distinct desktop preserves startup ordering and each client's lifetime.
         ["explorer", "/desktop=MapleRoyals-\(clientID.uuidString),1024x768", "C:\\MapleRoyals\\MapleRoyals.exe"]
     }
 
-    func gameProcess(clientID: UUID) throws -> Process {
+    func gameProcess(clientID: UUID, allowCompatibilityChanges: Bool = true) throws -> Process {
         guard ready else { throw SetupError(message: "Complete the game installation first.") }
+        if try AdapterCompatibility.prepare(prefix: prefix, engine: engine, resources: resources, allowChanges: allowCompatibilityChanges) {
+            note("Installed IPv4 adapter compatibility component in Wine syswow64; game folder and shared runtime unchanged")
+        }
         let child = Process()
         child.executableURL = engine.appendingPathComponent("bin/wine")
         child.arguments = Self.gameArguments(clientID: clientID)
         child.environment = environment()
+        child.environment?["WINEDLLOVERRIDES"] = AdapterCompatibility.overrides
         child.currentDirectoryURL = game.deletingLastPathComponent()
         child.standardOutput = log
         child.standardError = log

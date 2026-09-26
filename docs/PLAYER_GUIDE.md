@@ -28,17 +28,25 @@ START-HERE.txt
 
 There may also be a build information file; you can leave it alone. Move **MapleRoyals.app** into Applications, or another folder you intend to keep. No separate fullscreen apps are needed.
 
-Go to the [official MapleRoyals downloads page](https://royals.ms/downloads) and download the **Windows WZ** installer into Downloads. Leave it as an `.exe` file; do not try to open or extract it in Finder. You only need WZ for this setup. IMG was not tested. The tested file was `MapleRoyalsSetupWz-02.07.26.exe`; newer releases may behave differently.
+Go to the [official MapleRoyals downloads page](https://royals.ms/downloads) and download the **Windows WZ** installer into Downloads. Leave it as an `.exe` file; do not try to open or extract it in Finder. You only need WZ for this setup. IMG was not tested. First-time setup was tested with `MapleRoyalsSetupWz-02.07.26.exe`; updating an existing installation to `MapleRoyalsSetupWz-21.09.26.exe` and playing afterward were also confirmed. Future releases may behave differently.
 
 ## 2. Open the app
 
 Double-click **MapleRoyals.app**. If macOS blocks it on first opening, follow [the first-open instructions below](#if-macos-blocks-the-first-open).
 
+**Launcher 0.3.0** groups all controls on one page under three headings:
+
+- **Play:** launch the game, open more clients, and see their numbered cards.
+- **Resolution:** choose the screen size and refresh rate, apply them, or restore your normal display.
+- **Settings:** complete setup, install downloaded game updates, view logs, and find game files.
+
+All three groups are visible together. Scroll if your screen is too small to fit the whole launcher. First-time setup is under Settings. Opening the app does not launch anything or apply a resolution. The currently published 0.2.0 launcher uses the earlier layout.
+
 If the launcher says Rosetta is needed, click **Enable Rosetta**. Complete Apple's installation prompt yourself, then return to the launcher and click **Check again**. Rosetta lets this Mac run the Intel support software used by the game. If no Rosetta prompt appears, continue.
 
 ## 3. Install the game once
 
-1. Click **Choose game installer…** and select the official WZ `.exe` you downloaded.
+1. Click **Choose WZ installer…** (called **Choose game installer…** in older launchers) and select the official WZ `.exe` you downloaded.
 2. Click **Install game**. The app downloads about 260 MB of support files and prepares the game environment. Leave the app open; this can take several minutes.
 3. When the Windows installer appears, follow its prompts and review any terms yourself. Keep the destination as **`C:\MapleRoyals`**. This is a folder managed by the app, not a new disk on your Mac.
 4. Complete any included **Visual C++** installation prompts.
@@ -47,7 +55,28 @@ If the launcher says Rosetta is needed, click **Enable Rosetta**. Complete Apple
 
 If macOS asks for access to Downloads so the app can read the installer you selected, allow that access if it matches what you are doing. Keep passwords and your PIC inside the game; never send them in chat, logs, or GitHub issues.
 
-## Updating an existing installation
+## Updating the game files (launcher 0.3.0)
+
+Use this when MapleRoyals announces that you must download and reinstall the game. You download the installer yourself; the launcher helps you install the downloaded file. This needs **launcher 0.3.0 or newer**; 0.2.0 does not have the **Install downloaded update…** button.
+
+1. Close **every game window**, under **Settings**, click **Install downloaded update…**.
+2. If you have not downloaded the new installer yet, click **Open download page**. This opens the MapleRoyals website in your browser. Download the latest **Windows WZ** installer there and leave the downloaded file as an `.exe`.
+3. Return to the launcher, click **Choose WZ installer…**, and select that new file in Downloads.
+4. Click **Run selected installer**. Leave the launcher open while it prepares a separate copy of the installation. Allow about **10 GB of free space** for the download, new files and backup; larger future updates may need more.
+5. Complete the Windows installer. Keep **`C:\MapleRoyals`**, review any terms yourself, and turn **off Launch MapleRoyals** before Finish. If the installer starts the game, close that game so the update can finish.
+6. Wait for **Game files installed**, then click **Play**. Installing an update does not start the game automatically.
+
+While choosing or running the installer, the launcher shows only the installer instructions and actions. Play, Resolution and unrelated Settings controls are hidden. **Back to launcher** brings all three groups back before installation starts; they also return after successful installation. If installation fails, **Show log** appears to help with troubleshooting.
+
+The launcher reuses Wine and its settings. It installs fresh game files separately, then switches to them after the installer reports success. Launcher display preferences are retained. Files you manually added inside the old game folder are kept in the backup, not copied over the new game files.
+
+Before installation begins, **Back to launcher** returns to the normal launcher. Once the Windows installer is open, use its **Cancel** button if needed. If installation is cancelled or fails before activation, the previous installation remains in place. The previous version may no longer connect to the updated server; retry with the latest WZ installer. No one-click downgrade is provided.
+
+Successful updates keep a previous-installation copy under **Settings → Game files → backups**. Incomplete attempts can leave files under **updates**. These folders use additional disk space and are not automatically deleted. Keep the backup until the updated game has been tested. Never delete the **prefixes**, **runtimes**, or **installation.json** items to update the game. If the app was forcibly closed during an update, restart the Mac before retrying so the old installer is no longer running; the launcher recovers an interrupted installation switch when reopened.
+
+The launcher does not check the website for versions or download game installers automatically. Select the latest WZ installer yourself for each game update.
+
+## Updating the Mac launcher
 
 If the app stopped showing a game window after a macOS 27 upgrade, get the current ZIP from [the same download link](https://github.com/auslach/mapleroyals-mac/raw/refs/heads/main/download/MapleRoyals-Mac.zip). It contains launcher **0.2.0**, which includes the startup fix and fullscreen controls.
 
@@ -63,7 +92,7 @@ If setup failed before the Windows installer appeared, restart your Mac once aft
 
 Every opening shows the launcher with **800×600 selected**. Opening it does not change your screen resolution or load the game. There is no automatic-launch option.
 
-For fullscreen: click **Change screen resolution**, confirm **Keep resolution** if asked, then click **Play**. For the normal Mac desktop: skip the resolution button and click **Play**. Choosing an item in the Display menu alone does not apply it. Play starts the game using the current screen settings.
+For fullscreen in 0.3.0: under **Resolution**, click **Change screen resolution**, confirm **Keep resolution** if asked, then click **Play** above. For the normal Mac desktop: skip the resolution button and click **Play**. Choosing an item in the Display menu alone does not apply it. Play starts the game using the current screen settings.
 
 Keep the launcher open while playing. Close all game clients normally before quitting the launcher. The app restores any fullscreen display it created after the last client closes.
 
@@ -78,6 +107,8 @@ Your game files stay in your Mac account even if you move the app. You can add t
 
 Use the same launcher for all clients; do not duplicate the app or installation. Clients share game files and saved settings. More clients use more memory and graphics resources, so performance depends on your Mac. Start with 800×600.
 
+In **launcher 0.3.0**, the **Play** section shows a small box for each open client, labelled **Client 1**, **Client 2**, and so on in launch order. Closing a client removes its box; the remaining numbers stay the same. Scroll down in the launcher if the boxes do not fit on screen. These boxes show which clients the launcher has open, not whether a character is logged in. They do not contain screenshots, and no Screen Recording permission is needed.
+
 Two accounts were confirmed logged in at the same time on an M1 Pro running macOS 27.0, after retrying the second client. If a client closes during login, click **Open another client** to retry; leave any working client open. The intermittent failure is unresolved. More than two simultaneous game clients have not been tested.
 
 ## Fullscreen with black side bars
@@ -86,14 +117,14 @@ Fullscreen is part of **MapleRoyals.app**. You do not need to open a separate re
 
 **While fullscreen scaling is active, the whole Mac desktop is scaled too—even when you switch to another app.** All clients share this display setting. The app restores the desktop when the last client closes. Scaling only the game while keeping the desktop unchanged is not implemented.
 
-1. Open **MapleRoyals.app**. The **Display** menu defaults to **Fullscreen scaling — 800×600**. Select **1024×768** if you prefer. Selecting a size alone does not change the screen.
+1. Open **MapleRoyals.app**. In 0.3.0, find the **Resolution** heading. The **Display** menu defaults to **Fullscreen scaling — 800×600**. Select **1024×768** if you prefer. Selecting a size alone does not change the screen.
 2. Choose **60 Hz**, or **120 Hz** for a compatible ProMotion MacBook Pro such as the tested M1 Pro.
 3. Click **Change screen resolution**. This applies the display mode without starting the game.
 4. The first time you use that size/rate on this display and macOS version, click **Keep resolution** within **20 seconds** if the picture looks right. If you do nothing or click **Cancel test**, your normal display returns. Confirmed modes do not repeat this test. Keeping the resolution still does not launch the game.
 5. Click **Play** to start the game. Set the game's resolution separately to match the selected display size. Use **800×600** in the game with the 800×600 display. Press **Option + Return** inside the game if it still shows window borders.
 6. Close all game clients normally when finished. The launcher restores the normal Mac display automatically after the last client closes.
 
-The **Restore normal display** button is available after applying a resolution, before or during gameplay. Quitting an idle launcher also restores its display. You can change size or refresh rate while the game is running: choose the new settings and click **Change screen resolution**. Confirm **Keep resolution** if asked. This keeps the existing game session running; do not press Play again. The controls pause briefly while applying or confirming a display change. Set the game’s own resolution separately if you change sizes. Keep the launcher open while the game is running. Each fresh opening selects 800×600 again; the refresh rate and confirmed modes are remembered.
+The **Restore normal display** button is available after applying a resolution, before or during gameplay. Quitting an idle launcher also restores its display. You can change size or refresh rate while the game is running: under **Resolution** in 0.3.0, choose the new settings and click **Change screen resolution**. Confirm **Keep resolution** if asked. This keeps the existing game session running; do not press Play again. The controls pause briefly while applying or confirming a display change. Set the game’s own resolution separately if you change sizes. Keep the launcher open while the game is running. Each fresh opening selects 800×600 again; the refresh rate and confirmed modes are remembered.
 
 An 800×600 display mode is not a confirmed graphics-performance improvement; the game itself was smoother at 800×600. A 120 Hz display does not mean the game renders at 120 frames per second. Other displays, forced app termination, sleep/wake and unexpected crashes have not been fully tested.
 
@@ -117,11 +148,13 @@ Do not disable system security or override a malware/damaged-app warning. Work o
 | Source files but no app | Open **download → MapleRoyals-Mac.zip** in the repository folder and unpack that ZIP. You do not need to run `setup.py`. |
 | Setup stopped partway through | Close the game and installer, quit the launcher, then reopen it and choose the official installer again if asked. Keep the installer until setup finishes. If the problem repeats, use **Show log** and contact the maintainer. |
 | No game window after upgrading to macOS 27 | Follow **Updating an existing installation** above. Use launcher 0.2.0; do not delete or reinstall your game data. |
-| The game fails when selecting a character | One initial failure occurred during testing, followed by a successful retry. Its cause is unknown. If it repeats, report whether the entire game closed or it returned to login. |
+| The game fails when selecting a character | A fix for one confirmed cause is included in the upcoming 0.3.0 source, but not the linked 0.2.0 ZIP. You do not need to add DLL files yourself. If it repeats, use Show log and report whether the game closed or returned to login. |
 | 1024×768 feels laggy | Use **800×600**. Fullscreen scaling does not fix this rendering-performance difference. |
 | The game stays small in the top-left corner | Follow the fullscreen steps above. The game's fullscreen toggle alone did not scale correctly on the tested Mac. |
 | The desktop is still scaled after playing | Click **Restore normal display** in the launcher. If you used an older separate helper, restore and quit that helper. |
 | The app or download shows an error | Use **Show log** and send the maintainer the error, your Mac model/chip, macOS version and installer filename. |
+
+In 0.3.0, **Show log** and **Game files** are in the **Settings** section, and **Restore normal display** is in **Resolution**.
 
 Logs can contain your local username and file paths. Review them before sharing, and never send your password, PIC or the whole game folder.
 
